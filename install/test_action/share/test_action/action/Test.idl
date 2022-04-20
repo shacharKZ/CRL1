@@ -1,0 +1,18 @@
+// generated from rosidl_adapter/resource/action.idl.em
+// with input from test_action/action/Test.action
+// generated code does not contain a copyright notice
+
+
+module test_action {
+  module action {
+    struct Test_Goal {
+      sequence<float> pose;
+    };
+    struct Test_Result {
+      string status;
+    };
+    struct Test_Feedback {
+      string feedback;
+    };
+  };
+};
