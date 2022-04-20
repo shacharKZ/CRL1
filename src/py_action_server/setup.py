@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'action_server_node = py_action_server.action_server:main',
+            'robot_manager_node = py_action_server.robot_manager:main',
         ],
     },
 )

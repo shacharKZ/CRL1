@@ -1,10 +1,53 @@
+import sys
 import rclpy
-from rclpy.action import ActionServer
 from rclpy.node import Node
+from rclpy.action import ActionServer
+# from action_server import TestActionServer
 from rclpy.duration import Duration
 from test_action.action import Test
 from geometry_msgs.msg import Twist, PoseStamped
 from nav2_simple_commander.robot_navigator import BasicNavigator
+
+
+class ManagerNode(Node):
+    server_list = []
+    robot_coords_list = []
+
+    def __init__(self):
+        super().__init__('RobotManagerNode')
+
+        self.declare_parameter('robot_positions_list', "1,2;3,4")
+
+        param_test = self.get_parameter('robot_positions_list')
+        self.robot_coords_list = self.parse_coords_list(param_test.value)
+        print('result:')
+        print(self.parse_coords_list(param_test.value))
+
+        self.setup_servers()
+        # self.get_logger().info(f'Received param: {param_test.value}')
+
+    def setup_servers(self):
+        i = 0
+        for robot in self.robot_coords_list:
+            server = TestActionServer(robot[0], 0)
+            self.get_logger().info(f'Spinning up server: {i}')
+            rclpy.spin(server)
+            self.get_logger().info(f'Finished spinning up server: {i}')
+            self.server_list.append(server)
+            i += 1
+
+    @staticmethod
+    def parse_coords_list(coords: str):
+        individual_robot_lists = coords.split(';')
+        robot_coords_list = []
+        for r_list in individual_robot_lists:
+            current_fixed_robot_coords = []
+            coord_pairs = r_list.split(':')
+            for coord_pair in coord_pairs:
+                coord = coord_pair.split(',')
+                current_fixed_robot_coords.append((float(coord[0]), float(coord[1]), 0.0, 0.0))
+            robot_coords_list.append(current_fixed_robot_coords)
+        return robot_coords_list
 
 
 class TestActionServer(Node):
@@ -40,7 +83,7 @@ class TestActionServer(Node):
         x, y, z, w = goal_handle.request.pose
         msg = PoseStamped()
         msg.header.frame_id = 'map'
-        msg.header.stamp = self.navigator.get_clock().now().to_msg()
+        msg.header.stamp = self.navigator.get_clock().now().to_mzsg()
         msg.pose.position.x = x
         msg.pose.position.y = y
         msg.pose.orientation.z = z
@@ -80,22 +123,10 @@ class TestActionServer(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    navigator = BasicNavigator()
-    initial_pose = PoseStamped()
-    initial_pose.header.frame_id = 'map'
-    initial_pose.header.stamp = navigator.get_clock().now().to_msg()
-    initial_pose.pose.position.x = 3.45
-    initial_pose.pose.position.y = 2.15
-    initial_pose.pose.orientation.z = 1.0
-    initial_pose.pose.orientation.w = 0.0
-    navigator.setInitialPose(initial_pose)
-
-    # Wait for navigation to fully activate, since autostarting nav2
-    navigator.waitUntilNav2Active()
-
-    test_action_server = TestActionServer(navigator)
-
-    rclpy.spin(test_action_server)
+    node = ManagerNode()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
 
 
 if __name__ == '__main__':
