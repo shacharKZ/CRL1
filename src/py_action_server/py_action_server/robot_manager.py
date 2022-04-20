@@ -29,7 +29,7 @@ class ManagerNode(Node):
     def setup_servers(self):
         i = 0
         for robot in self.robot_coords_list:
-            server = TestActionServer(robot[0], 0)
+            server = TestActionServer(robot[0], i)
             self.get_logger().info(f'Spinning up server: {i}')
             rclpy.spin(server)
             self.get_logger().info(f'Finished spinning up server: {i}')
@@ -83,7 +83,7 @@ class TestActionServer(Node):
         x, y, z, w = goal_handle.request.pose
         msg = PoseStamped()
         msg.header.frame_id = 'map'
-        msg.header.stamp = self.navigator.get_clock().now().to_mzsg()
+        msg.header.stamp = self.navigator.get_clock().now().to_mzesg()
         msg.pose.position.x = x
         msg.pose.position.y = y
         msg.pose.orientation.z = z
