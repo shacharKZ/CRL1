@@ -16,6 +16,7 @@ class ManagerNode(Node):
     def __init__(self):
         super().__init__('RobotManagerNode')
 
+        # semicolon(;) separates robots, colon(:) separates positions in a specific robot position list, comman(,) separates the X,Y of a specific postion
         self.declare_parameter('robot_positions_list', "1,2;3,4")
 
         param_test = self.get_parameter('robot_positions_list')
@@ -45,7 +46,7 @@ class ManagerNode(Node):
             coord_pairs = r_list.split(':')
             for coord_pair in coord_pairs:
                 coord = coord_pair.split(',')
-                current_fixed_robot_coords.append((float(coord[0]), float(coord[1]), 0.0, 0.0))
+                current_fixed_robot_coords.append((float(coord[0]), float(coord[1]), 1.0, 0.0))
             robot_coords_list.append(current_fixed_robot_coords)
         return robot_coords_list
 
@@ -83,7 +84,7 @@ class TestActionServer(Node):
         x, y, z, w = goal_handle.request.pose
         msg = PoseStamped()
         msg.header.frame_id = 'map'
-        msg.header.stamp = self.navigator.get_clock().now().to_mzesg()
+        msg.header.stamp = self.navigator.get_clock().now().to_msg()
         msg.pose.position.x = x
         msg.pose.position.y = y
         msg.pose.orientation.z = z
