@@ -4,8 +4,9 @@ from rclpy.node import Node
 from rclpy.action import ActionServer
 # from action_server import TestActionServer
 from rclpy.duration import Duration
+from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 from test_action.action import Test
-from geometry_msgs.msg import Twist, PoseStamped
+from geometry_msgs.msg import Twist, PoseStamped, PoseWithCovarianceStamped
 from nav2_simple_commander.robot_navigator import BasicNavigator
 
 
@@ -61,14 +62,28 @@ class TestActionServer(Node):
             Test,
             f'my_action{robot_id}',
             self.execute_callback)
-        self.publisher_ = self.create_publisher(PoseStamped, '/cmd_vel', 10)
+        self.publisher_ = self.create_publisher(PoseStamped, f'/robot{robot_id}/cmd_vel', 10)
         self.navigator = BasicNavigator()
+
+        amcl_pose_qos = QoSProfile(
+          durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
+          reliability=QoSReliabilityPolicy.RELIABLE,
+          history=QoSHistoryPolicy.KEEP_LAST,
+          depth=1)
+
+        self.navigator.localization_pose_sub = self.navigator.create_subscription(PoseWithCovarianceStamped,
+                                                              f'/robot{robot_id}/amcl_pose',
+                                                              self.navigator._amclPoseCallback,
+                                                              amcl_pose_qos)
         x, y, z, w = initial_pos
         initial_pose = PoseStamped()
         initial_pose.header.frame_id = 'map'
         initial_pose.header.stamp = self.navigator.get_clock().now().to_msg()
         initial_pose.pose.position.x = x
         initial_pose.pose.position.y = y
+        initial_pose.pose.position.z = 0.1
+        initial_pose.pose.orientation.x = 0.0
+        initial_pose.pose.orientation.y = 0.0
         initial_pose.pose.orientation.z = z
         initial_pose.pose.orientation.w = w
         self.navigator.setInitialPose(initial_pose)
