@@ -21,6 +21,12 @@ class ExecuterPlanListener(Node):
     def listener_callback(self, msg):
         self.get_logger().info(f'I received message: {msg}')
         self.parse_plan_message(msg)
+        message = Twist()
+        message.linear.x = 5.0
+        message.linear.y = 0.0
+        # assume we gave parameters to all of twist (linear+angular)
+        # This command should work: if not, refer back to the publisher/subscriber example in ROS2 website
+        self.publisher_dict[0].publish(message)
         # robot_id = msg.robotid0
         # x = msg.robot0x
         # y = msg.robot0y
