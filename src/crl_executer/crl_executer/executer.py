@@ -100,12 +100,27 @@ class Executer(Node):
                 # This is the first message about this robot, and the robot has no initial position, so the first pose stamped is the robots' initial position
                 self._save_robot_initial_position(target_robot_id, msg.path[0])
             # Tell robot to stop performing current tasks and begin a new path
-            self._send_twist_message(0)
-            self._send_twist_message_1(1)
+            command = self._get_twist_from_pose_pair(msg.path[0], msg.path[1])
+            # self._send_twist_message_base(command)
+            self._send_twist_message_base(0)
+            # self._send_twist_message(0)
+            # self._send_twist_message_1(1)
         elif task == 'EXTEND':
             self.get_logger().warn('Received EXTEND!')
             # Tell the robot to continue with these added assignments after it is done with current tasks
             pass
+
+    def _send_twist_message_base(self, robot_id):
+        self.get_logger().warn('Sending twist message!')
+        cmd_vel_pub = self.create_publisher(Twist, f'/cmd_vel', 10)
+        twist_msg = Twist()
+        twist_msg.linear.x = 0.1
+        twist_msg.linear.y = 0.0
+        twist_msg.linear.z = 0.0
+        twist_msg.angular.x = 0.1
+        twist_msg.angular.y = 0.0
+        twist_msg.angular.z = 0.0
+        cmd_vel_pub.publish(twist_msg)
 
     def _send_twist_message(self, robot_id):
         self.get_logger().warn('Sending twist message!')
@@ -130,6 +145,11 @@ class Executer(Node):
         twist_msg.angular.y = 0.1
         twist_msg.angular.z = 0.0
         cmd_vel_pub.publish(twist_msg)
+
+    def _get_twist_from_pose_pair(self, pose1: PoseStamped, pose2: PoseStamped):
+        # Calculate a PID/twist message output from the pose inputs
+        result_twist = Twist()
+        return result_twist
 
     def _save_robot_initial_position(self, robot_id, pose_stamped: PoseStamped):
         initial_pose = Pose()
