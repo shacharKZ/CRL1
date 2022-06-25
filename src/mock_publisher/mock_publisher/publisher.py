@@ -21,9 +21,9 @@ class MockPublisher(Node):
     def publish_mock_message_to_topic(self):
         message = RobotPathAssignment()
         message.target_robot_id = 0
-        message.path.append(self.construct_pose_stamped(2.0,3.0,0.1))
+        message.path.append(self.construct_pose_stamped(-2.0,-0.5,0.1))
         time.sleep(1)
-        message.path.append(self.construct_pose_stamped(2.5, 3.0, 0.1))
+        message.path.append(self.construct_pose_stamped(-2.5, -0.5, 0.1))
         message.task = 'START'
 
         self.msg_publisher.publish(message)
