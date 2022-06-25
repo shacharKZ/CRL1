@@ -11,6 +11,7 @@
   <exec_depend>goal_status_interface</exec_depend>
   <exec_depend>robot_status_interface</exec_depend>
   <exec_depend>robot_path_assignment_interface</exec_depend>
+  <exec_depend>multi_burger_interfaces</exec_depend>
   <exec_depend>ros2launch</exec_depend>
 
 

@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'executer = crl_executer.executer:main',
-            'gazebo_launcher = crl_executer.gazebo:main'
+            'gazebo_launcher = crl_executer.gazebo:main',
+            'spawn_burger = crl_executer.spawn_burger:main'
         ],
     },
 )

@@ -24,9 +24,15 @@ def generate_launch_description():
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg_gazebo_ros, 'launch', 'gazebo.launch.py')
+            os.path.join(pkg_gazebo_ros, 'launch', 'gzserver.launch.py')
         ),
         launch_arguments={'world': world}.items()
+    )
+
+    gzclient_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_gazebo_ros, 'launch', 'gzclient.launch.py')
+        )
     )
 
     sim_time = ExecuteProcess(
@@ -34,4 +40,4 @@ def generate_launch_description():
         output='screen'
     )
 
-    return LaunchDescription([gazebo, sim_time])
+    return LaunchDescription([gazebo, gzclient_cmd, sim_time])
