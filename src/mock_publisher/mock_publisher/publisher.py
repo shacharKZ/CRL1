@@ -16,20 +16,37 @@ class MockPublisher(Node):
         self.msg_publisher = self.create_publisher(RobotPathAssignment, '/MAPF_PLAN', 10)
         # self.publish_mock_message_to_topic()
         timer_period = 1
-        self.timer = self.create_timer(timer_period, self.publish_mock_message_to_topic)
+        # self.timer = self.create_timer(timer_period, self.publish_mock_message_to_topic)
+        self.publish_mock_message_to_topic()
+        self.publish_mock_message_to_topic1()
 
     def publish_mock_message_to_topic(self):
         message = RobotPathAssignment()
         message.target_robot_id = 0
-        message.path.append(self.construct_pose_stamped(-2.0,-0.5,0.1))
+        message.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
         time.sleep(1)
-        message.path.append(self.construct_pose_stamped(-2.5, -0.5, 0.1))
+        message.path.append(self.construct_pose_stamped(0.5, 0.0, 0.1))
+        time.sleep(1)
+        message.path.append(self.construct_pose_stamped(0.5, 0.5, 0.1))
+        time.sleep(1)
+        message.path.append(self.construct_pose_stamped(0.0, 5.0, 0.1))
+        time.sleep(1)
+        message.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
         message.task = 'START'
 
         self.msg_publisher.publish(message)
 
+    def publish_mock_message_to_topic1(self):
+        message = RobotPathAssignment()
+        message.target_robot_id = 1
+        message.path.append(self.construct_pose_stamped(-1.0, 2.0, 0.1))
+        time.sleep(1)
+        message.path.append(self.construct_pose_stamped(-2.0, 2.0, 0.1))
+        message.task = 'START'
 
-    def construct_pose_stamped(self, px, py, pz ):
+        self.msg_publisher.publish(message)
+
+    def construct_pose_stamped(self, px, py, pz):
         pose = PoseStamped()
         pose.header.frame_id = 'map'
         pose.header.stamp = self.get_clock().now().to_msg()
@@ -42,6 +59,7 @@ class MockPublisher(Node):
         pose.pose.orientation.w = 1.0
 
         return pose
+
 
 def main(args=None):
     rclpy.init(args=args)

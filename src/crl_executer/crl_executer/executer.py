@@ -102,10 +102,14 @@ class Executer(Node):
             pass
         elif task == 'START':
             self.get_logger().warn('Received START!')
-            if target_robot_id not in ROBOT_CACHE:
-                # This is the first message about this robot, and the robot has no initial position, so the first pose stamped is the robots' initial position
-                self._save_robot_initial_position(target_robot_id, msg.path[0])
-                self._spawn_burger_bot_and_service(target_robot_id, (msg.path[0]))
+            for path_target in msg.path:
+                if target_robot_id not in ROBOT_CACHE:
+                    # This is the first message about this robot, and the robot has no initial position, so the first pose stamped is the robots' initial position
+                    self._save_robot_initial_position(target_robot_id, path_target)
+                    self._spawn_burger_bot_and_service(target_robot_id, path_target)
+                else:
+                    self._send_next_point_to_robot(target_robot_id, path_target)
+            # This is another command in the robot's lifecycle, need to send him the command using the client
             # Tell robot to stop performing current tasks and begin a new path
             # command = self._get_twist_from_pose_pair(msg.path[0], msg.path[1])
             # self._send_twist_message_base(command)
@@ -162,7 +166,7 @@ class Executer(Node):
         initial_pose = Pose()
         initial_pose.position = pose_stamped.pose.position
         initial_pose.orientation = pose_stamped.pose.orientation
-        ROBOT_CACHE[robot_id] = initial_pose
+        ROBOT_CACHE[robot_id] = {"initial_pose": initial_pose}
 
     def _save_robot_current_position(self, robot_id, pose_stamped: PoseStamped):
         initial_pose = Pose()
@@ -178,28 +182,20 @@ class Executer(Node):
         self.get_logger().info(f'Spawning robot with id {target_robot_id} at position {x}, {y}, {z}')
         test = subprocess.Popen(["ros2", "run", "crl_executer", "spawn_burger", robot_name, str(x), str(y), str(z)])
         robot_client = PathClient(robot_name)
-        robot_client.next_step(-3, -0.5, 1)
-        # test.communicate()
+        ROBOT_CACHE[target_robot_id]["client"] = robot_client
 
-        # bot = SpawnBurger(robot_name, x, y, z)
-        # rclpy.spin_until_future_complete(bot, bot.future)
-        # if bot.future.result() is not None:
-        #     print('response: %r' % bot.future.result())
-        #
-        # bot.get_logger().info(f"Done Spawning robot{target_robot_id}! Shutting down node.")
-        # bot.destroy_node()
-        #
-        # self.get_logger().info(f'Spawning Position Service for robot with id {target_robot_id}')
-        # service_ref = PositionService(robot_name)
-        # current_service = multiprocessing.Process(target=rclpy.spin, args=(service_ref))
-        # current_service.start()
-        # # service = PositionService(robot_name)
-        # # rclpy.spin(service)
-        #
-        # service_ref.drive_foward()
-        self.get_logger().info('here')
+        self.get_logger().info(f'robot {target_robot_id} spawned successfully!')
 
-        # rclpy.shutdown()
+    def _send_next_point_to_robot(self, target_robot_id: int, next_position: PoseStamped):
+        robot_name = f'robot{target_robot_id}'
+        x = next_position.pose.position.x
+        y = next_position.pose.position.y
+        z = next_position.pose.position.z
+        self.get_logger().info(f'Sending {robot_name} to position {x}, {y}, {z}')
+        robot_client = ROBOT_CACHE[target_robot_id]["client"]
+        robot_client.next_step(x, y, 0)
+        robot_client.next_step(x, y, 1)
+        self.get_logger().info(f'Done current command')
 
 
 def main(args=None):

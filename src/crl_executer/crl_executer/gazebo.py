@@ -16,10 +16,16 @@ def generate_launch_description():
     # Find Gazebo server directory
     pkg_gazebo_ros = get_package_share_directory('gazebo_ros')
 
+    # world = os.path.join(
+    #     get_package_share_directory('turtlebot3_gazebo'),
+    #     'worlds',
+    #     'turtlebot3_world.world'
+    # )
+
     world = os.path.join(
         get_package_share_directory('turtlebot3_gazebo'),
         'worlds',
-        'turtlebot3_world.world'
+        'empty_world.world'
     )
 
     gazebo = IncludeLaunchDescription(
