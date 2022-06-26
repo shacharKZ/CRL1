@@ -15,8 +15,11 @@ class PathClient(Node):
         self.req = Position.Request()
 
     def next_step(self, x, y, act):
-        self.req.x = float(x) / 2 + 0.25
-        self.req.y = float(y) / 2 + 0.25
+        # original the following transform was applied. in Gazebo it does not work
+        # self.req.x = float(x) / 2 + 0.25
+        # self.req.y = float(y) / 2 + 0.25
+        self.req.x = float(x)
+        self.req.y = float(y)
         self.req.action = act
 
         self.future = self.client.call_async(self.req)

@@ -25,11 +25,11 @@ class MockPublisher(Node):
         message.target_robot_id = 0
         message.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
         time.sleep(1)
-        message.path.append(self.construct_pose_stamped(0.5, 0.0, 0.1))
+        message.path.append(self.construct_pose_stamped(1.0, 0.0, 0.1))
         time.sleep(1)
-        message.path.append(self.construct_pose_stamped(0.5, 0.5, 0.1))
+        message.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
         time.sleep(1)
-        message.path.append(self.construct_pose_stamped(0.0, 5.0, 0.1))
+        message.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
         time.sleep(1)
         message.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
         message.task = 'START'
@@ -49,7 +49,7 @@ class MockPublisher(Node):
     def construct_pose_stamped(self, px, py, pz):
         pose = PoseStamped()
         pose.header.frame_id = 'map'
-        pose.header.stamp = self.get_clock().now().to_msg()
+        pose.header.stamp = self.get_clock().now().to_msg()  # TODO try to look into that
         pose.pose.position.x = px
         pose.pose.position.y = py
         pose.pose.position.z = pz
