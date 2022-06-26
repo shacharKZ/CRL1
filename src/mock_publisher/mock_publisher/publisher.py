@@ -17,20 +17,50 @@ class MockPublisher(Node):
         # self.publish_mock_message_to_topic()
         timer_period = 1
         # self.timer = self.create_timer(timer_period, self.publish_mock_message_to_topic)
-        self.publish_mock_message_to_topic()
-        self.publish_mock_message_to_topic1()
+        self.publish_mock_message_to_topic0()
+        # self.publish_mock_message_to_topic()
+        # self.publish_mock_message_to_topic1()
+
+    def publish_mock_message_to_topic0(self):
+        self.get_logger().info('BP1')
+        message0 = RobotPathAssignment()
+        message0.target_robot_id = 0
+        message0.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
+        message0.path.append(self.construct_pose_stamped(-1.0, 0.0, 0.1))
+        message0.path.append(self.construct_pose_stamped(-1.0, -1.0, 0.1))
+        message0.path.append(self.construct_pose_stamped(0.0, -1.0, 0.1))
+        message0.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
+        message0.task = 'START'
+        self.msg_publisher.publish(message0)
+        self.get_logger().info('BP2')
+
+        message1 = RobotPathAssignment()
+        message1.target_robot_id = 1
+        message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
+        message1.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
+        message1.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
+        message1.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
+        message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
+        message1.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
+        message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
+        message1.path.append(self.construct_pose_stamped(1.0, -1.0, 0.1))
+        message1.path.append(self.construct_pose_stamped(1.0, 0.0, 0.1))
+
+        message1.task = 'START'
+        self.msg_publisher.publish(message1)
+        self.get_logger().info('BP3')
 
     def publish_mock_message_to_topic(self):
         message = RobotPathAssignment()
         message.target_robot_id = 0
         message.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
-        time.sleep(1)
-        message.path.append(self.construct_pose_stamped(1.0, 0.0, 0.1))
-        time.sleep(1)
+        # time.sleep(1)
+        message.path.append(self.construct_pose_stamped(-1.0, 0.0, 0.1))
+        # time.sleep(1)
         message.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
-        time.sleep(1)
+        # time.sleep(1)
         message.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
-        time.sleep(1)
+        # time.sleep(1)
         message.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
         message.task = 'START'
 

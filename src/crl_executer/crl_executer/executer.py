@@ -194,6 +194,7 @@ class Executer(Node):
         self.get_logger().info(f'Sending {robot_name} to position {x}, {y}, {z}')
         robot_client = ROBOT_CACHE[target_robot_id]["client"]
         robot_client.next_step(x, y, 0)
+        robot_client.next_step(x, y, 0)  # solve the incapable of walking 180 deg from your position
         robot_client.next_step(x, y, 1)
         self.get_logger().info(f'Done current command')
 
