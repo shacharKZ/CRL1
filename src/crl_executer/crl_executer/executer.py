@@ -8,14 +8,14 @@ from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Pose, Twist
 from goal_status_interface.msg import GoalStatus
 from robot_status_interface.msg import RobotStatus
-from robot_path_assignment_interface.msg import RobotPathAssignment
+from robot_path_assignment_interface.msg import RobotPathAssignment, RobotPathAssignmentPlan
 from crl_executer.spawn_burger import SpawnBurger
 from crl_executer.position_service import PositionService
 from crl_executer.path_client import PathClient
 
-MAPF_PLAN_TOPIC = '/MAPF_PLAN'
-ROBOT_STATUS_TOPIC = '/ROBOT_STATUS'
-GOAL_STATUS_TOPIC = '/GOAL_STATUS'
+PLAN_TOPIC = '/plan'
+ROBOT_STATUS_TOPIC = '/robotStatus'
+GOAL_STATUS_TOPIC = '/goalStatus'
 
 BASE_ROBOT_TOPIC = '/robot/'
 
@@ -31,7 +31,7 @@ class Executer(Node):
 
     def subscribe_to_mapf_plan_topic(self):
         my_callback_group = ReentrantCallbackGroup()
-        self.plan_input_topic = self.create_subscription(RobotPathAssignment, MAPF_PLAN_TOPIC, self.send_plan_to_robot,
+        self.plan_input_topic = self.create_subscription(RobotPathAssignment, PLAN_TOPIC, self.send_plan_to_robot,
                                                          10, callback_group=my_callback_group)
 
     def expose_robot_status_topic(self):

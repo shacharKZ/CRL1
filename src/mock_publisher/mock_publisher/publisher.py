@@ -8,13 +8,14 @@ from goal_status_interface.msg import GoalStatus
 from robot_status_interface.msg import RobotStatus
 from robot_path_assignment_interface.msg import RobotPathAssignment
 
+PLAN_TOPIC = '/plan'
 
 class MockPublisher(Node):
     msg_publisher = None
 
     def __init__(self):
         super().__init__('MockPublisher')
-        self.msg_publisher = self.create_publisher(RobotPathAssignment, '/MAPF_PLAN', 10)
+        self.msg_publisher = self.create_publisher(RobotPathAssignment, PLAN_TOPIC, 10)
         # self.publish_mock_message_to_topic()
         timer_period = 1
         # self.timer = self.create_timer(timer_period, self.publish_mock_message_to_topic)
