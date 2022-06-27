@@ -1,6 +1,4 @@
 import time
-import random
-
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Quaternion
@@ -34,75 +32,13 @@ class MockPublisher(Node):
             for single_task in robot_plan:
                 x = single_task[0]
                 y = single_task[1]
-                task_type = single_task[2]  # TODO
-                custom_msg = single_task[3]  # TODO
+                goal_msg = single_task[2]
                 single_assignment.path.append(self.construct_pose_stamped(x, y, 0.1))
-            single_assignment.task = 'STARfutureT'  # TODO
+                single_assignment.goal_message.append(goal_msg)
+            single_assignment.task = 'START'
             full_message.plan.append(single_assignment)
         self.msg_publisher.publish(full_message)
-        #
-        # time.sleep(3)
-        # full_message = RobotPathAssignmentPlan()
-        # message = RobotPathAssignment()
-        # message.target_robot_id = 1
-        # message.task = 'STOP'
-        # full_message.plan.append(message)
-        # message1 = RobotPathAssignment()
-        # message1.target_robot_id = 3
-        # message1.task = 'STOP'
-        # full_message.plan.append(message1)
-        # self.msg_publisher.publish(full_message)
 
-
-    def publish_mock_message_to_topic0(self):
-        self.get_logger().info('BP1')
-        message = RobotPathAssignmentPlan()
-        message0 = RobotPathAssignment()
-        message0.target_robot_id = 0
-        message0.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
-        message0.path.append(self.construct_pose_stamped(0.0, -0.5, 0.1))
-        message0.path.append(self.construct_pose_stamped(0.5, -0.5, 0.1))
-        message0.path.append(self.construct_pose_stamped(0.5, 0.0, 0.1))
-        # message0.path.append(self.construct_pose_stamped(-1.0, -1.0, 0.1))
-        # message0.path.append(self.construct_pose_stamped(0.0, -1.0, 0.1))
-        # message0.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
-        message0.task = 'START'
-        # self.msg_publisher.publish(message0)
-        self.get_logger().info('BP2')
-
-        message1 = RobotPathAssignment()
-        message1.target_robot_id = 1
-        message1.path.append(self.construct_pose_stamped(0.0, 0.3, 0.1))
-        message1.path.append(self.construct_pose_stamped(0.0, 0.8, 0.1))
-        message1.path.append(self.construct_pose_stamped(0.5, 0.8, 0.1))
-        message1.path.append(self.construct_pose_stamped(0.5, 0.3, 0.1))
-        # message1.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
-        # message1.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
-        # message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
-        # message1.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
-        # message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
-        # message1.path.append(self.construct_pose_stamped(1.0, -1.0, 0.1))
-        # message1.path.append(self.construct_pose_stamped(1.0, 0.0, 0.1))
-
-        message1.task = 'START'
-        # self.msg_publisher.publish(message1)
-        self.get_logger().info('BP3')
-        message.plan = [message0, message1]
-        self.msg_publisher.publish(message)
-
-        time.sleep(2)
-
-        message2 = RobotPathAssignment()
-        message2.target_robot_id = 2
-        message2.path.append(self.construct_pose_stamped(1.0, 0.3, 0.1))
-        message2.path.append(self.construct_pose_stamped(1.0, 0.8, 0.1))
-        message2.path.append(self.construct_pose_stamped(1.5, 0.8, 0.1))
-        message2.path.append(self.construct_pose_stamped(1.5, 0.3, 0.1))
-        message2.task = 'START'
-        # self.msg_publisher.publish(message2)
-        self.get_logger().info('BP4')
-        message.plan = [message2]
-        self.msg_publisher.publish(message)
 
     def construct_pose_stamped(self, px, py, pz):
         pose = PoseStamped()

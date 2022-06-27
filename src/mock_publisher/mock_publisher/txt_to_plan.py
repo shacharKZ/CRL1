@@ -25,9 +25,6 @@ def parse_txt_to_plan(plan_path):
             if robot_num in entities_map:
                 entities_map[robot_num].append([x, y, goal_message])
             else:
-                if task_type != 'start':
-                    # warnings.warn(f'{robot_num} first task is {task_type} and not "start". auto change it to "start"')
-                    task_type = 'start'
                 entities_map[robot_num] = [[x, y, goal_message]]
     return entities_map
 
@@ -37,7 +34,7 @@ def generate_plan(n_entities, path_out=None):
     for i in range(n_entities):
         x = float(random.randint(-3, 3))
         y = float(random.randint(-3, 3))
-        plan = [[x, y, "start"]]
+        plan = [[x, y, ""]]
         task_number = random.randint(1, 20)
         for j in range(task_number):
             x = x + random.randint(-3, 3)
