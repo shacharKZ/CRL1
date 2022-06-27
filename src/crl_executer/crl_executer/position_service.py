@@ -124,7 +124,7 @@ class PositionService(Node):
 
         self.stop()
 
-        return self.get_position('bot1')
+        return self.get_position(self.name)
 
     def drive_forward(self):
         forward = Twist()

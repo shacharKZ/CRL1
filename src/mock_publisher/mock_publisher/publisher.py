@@ -26,10 +26,10 @@ class MockPublisher(Node):
         message0 = RobotPathAssignment()
         message0.target_robot_id = 0
         message0.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
-        message0.path.append(self.construct_pose_stamped(-1.0, 0.0, 0.1))
-        message0.path.append(self.construct_pose_stamped(-1.0, -1.0, 0.1))
-        message0.path.append(self.construct_pose_stamped(0.0, -1.0, 0.1))
-        message0.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
+        message0.path.append(self.construct_pose_stamped(0.5, 0.0, 0.1))
+        # message0.path.append(self.construct_pose_stamped(-1.0, -1.0, 0.1))
+        # message0.path.append(self.construct_pose_stamped(0.0, -1.0, 0.1))
+        # message0.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
         message0.task = 'START'
         self.msg_publisher.publish(message0)
         self.get_logger().info('BP2')
@@ -37,14 +37,14 @@ class MockPublisher(Node):
         message1 = RobotPathAssignment()
         message1.target_robot_id = 1
         message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
-        message1.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
-        message1.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
-        message1.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
-        message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
-        message1.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
-        message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
-        message1.path.append(self.construct_pose_stamped(1.0, -1.0, 0.1))
-        message1.path.append(self.construct_pose_stamped(1.0, 0.0, 0.1))
+        message1.path.append(self.construct_pose_stamped(1.5, 1.0, 0.1))
+        # message1.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
+        # message1.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
+        # message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
+        # message1.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
+        # message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
+        # message1.path.append(self.construct_pose_stamped(1.0, -1.0, 0.1))
+        # message1.path.append(self.construct_pose_stamped(1.0, 0.0, 0.1))
 
         message1.task = 'START'
         self.msg_publisher.publish(message1)
