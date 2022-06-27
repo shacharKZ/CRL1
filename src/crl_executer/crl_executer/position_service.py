@@ -18,8 +18,8 @@ POLL_RATE = 1e-4  # sec
 
 
 class PositionTracker(Node):
-    def __init__(self):
-        super().__init__('tracker')
+    def __init__(self, node_name: str):
+        super().__init__(node_name)
         self.client = self.create_client(GetEntityState, '/get_entity_state')
 
         while not self.client.wait_for_service(0.5):
@@ -39,7 +39,7 @@ class PositionService(Node):
         self.name = node_name
 
         # Position request client from gazebo
-        self.position_client = PositionTracker()
+        self.position_client = PositionTracker('position_tracker')
 
         # Position manipulation service
         self.service = self.create_service(Position, self.get_name() + '_service', self.service_callback)

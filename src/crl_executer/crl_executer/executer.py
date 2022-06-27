@@ -6,10 +6,12 @@ from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Pose, Twist
+from gazebo_msgs.srv import GetEntityState
 from goal_status_interface.msg import GoalStatus
 from robot_status_interface.msg import RobotStatus
 from robot_path_assignment_interface.msg import RobotPathAssignment, RobotPathAssignmentPlan
 from crl_executer.path_client import PathClient
+from crl_executer.position_service import PositionTracker
 
 PLAN_TOPIC = '/plan'
 INTERNAL_PLAN_TOPIC = '/planForwarder'
@@ -19,6 +21,7 @@ GOAL_STATUS_TOPIC = '/goalStatus'
 BASE_ROBOT_TOPIC = '/robot/'
 
 ROBOT_CACHE = {}
+TIMER_PERIOD = 5
 
 
 class Executer(Node):
@@ -27,6 +30,9 @@ class Executer(Node):
         self.subscribe_to_mapf_plan_topic()
         self.expose_robot_status_topic()
         self.expose_goal_status_topic()
+        self.robot_status_timer = self.create_timer(TIMER_PERIOD, self.publish_robot_status)
+        self.goal_status_timer = self.create_timer(TIMER_PERIOD, self.publish_goal_status)
+        self.executer_tracker = PositionTracker('executer_tracker')
 
     def subscribe_to_mapf_plan_topic(self):
         single_robot_plan_sender_cb_group = ReentrantCallbackGroup()
@@ -43,6 +49,21 @@ class Executer(Node):
     def expose_goal_status_topic(self):
         self.goal_status_topic = self.create_publisher(GoalStatus, GOAL_STATUS_TOPIC, 10)
 
+    def publish_robot_status(self):
+        # Query all robot locations and send them over the topic
+        self.get_logger().info('Publishing all robot status')
+        for robot_id in ROBOT_CACHE.keys():
+            position = self._get_position_by_name(f"robot{robot_id}")
+            message = RobotStatus()
+            message.robot_id = robot_id
+            message.current_location = self._construct_pose_stamped(position)
+            self.get_logger().info(f'Publishing status of robot {robot_id}')
+            self.robot_status_topic.publish(message)
+
+    def publish_goal_status(self):
+        # Query all goal locations and send them over the topic
+        pass
+
     # TODO: need to decide how to publish messages from both of these events, the format might be differnet, maybe we want to
     # publish from gazebo to virtual robots only, and the same from optiTrack to physical?
     def get_robot_status_from_gazebo(self):
@@ -55,44 +76,6 @@ class Executer(Node):
         # TODO: how?
         # In here we will subscribe to optiTrack somehow, and upon receiving events, a callback
         # will be issued that will publish the RobotStatus
-        pass
-
-    def publish_robot_status(self):
-        # TODO: depends on status from gazebo and optiTrack
-        # This is just a guess at the format
-        # msg = RobotStatus()
-        # msg.robot_id = 5
-        # msg.current_location.stamp.sec = 5
-        # msg.current_location.stamp.nanosec = 5
-        #
-        # msg.current_location.position.x = 1
-        # msg.current_location.position.y = 2
-        # msg.current_location.position.z = 3
-        #
-        # msg.current_location.orientation.x = 1
-        # msg.current_location.orientation.y = 2
-        # msg.current_location.orientation.z = 3
-        # msg.current_location.orientation.w = 4
-        # self.robot_status_topic.publish(msg)
-        pass
-
-    def publish_goal_status(self):
-        # TODO: depends on status from gazebo and optiTrack
-        # This is just a guess at the format
-        # msg = GoalStatus()
-        # msg.goal_id = 5
-        # msg.current_location.stamp.sec = 5
-        # msg.current_location.stamp.nanosec = 5
-        #
-        # msg.current_location.position.x = 1
-        # msg.current_location.position.y = 2
-        # msg.current_location.position.z = 3
-        #
-        # msg.current_location.orientation.x = 1
-        # msg.current_location.orientation.y = 2
-        # msg.current_location.orientation.z = 3
-        # msg.current_location.orientation.w = 4
-        # self.goal_status_topic.publish(msg)
         pass
 
     def handle_plan(self, msg):
@@ -209,6 +192,29 @@ class Executer(Node):
         robot_client.next_step(x, y, 0)  # solve the incapable of walking 180 deg from your position
         robot_client.next_step(x, y, 1)
         self.get_logger().info(f'Done current command')
+
+    def _get_position_by_name(self, name):
+        self.executer_tracker.get_pose(name)
+        position = None
+        while rclpy.ok():
+            rclpy.spin_once(self.executer_tracker)
+            if self.executer_tracker.future.done():
+                response: GetEntityState.Response = self.executer_tracker.future.result()
+                position = response.state.pose
+                # x = response.state.pose.position.x
+                # y = response.state.pose.position.y
+                # _, _, yaw = euler_from_quaternion(response.state.pose.orientation)
+
+                break
+
+        return position
+
+    def _construct_pose_stamped(self, position):
+        pose = PoseStamped()
+        pose.header.frame_id = 'map'
+        pose.header.stamp = self.get_clock().now().to_msg()
+        pose.pose = position
+        return pose
 
 
 def main(args=None):
