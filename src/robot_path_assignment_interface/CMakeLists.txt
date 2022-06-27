@@ -26,6 +26,7 @@ endif()
 
 set(msg_files
     "msg/RobotPathAssignment.msg"
+    "msg/RobotPathAssignmentPlan.msg"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
