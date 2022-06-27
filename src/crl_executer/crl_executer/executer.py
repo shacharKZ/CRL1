@@ -64,14 +64,6 @@ class Executer(Node):
         # Query all goal locations and send them over the topic
         pass
 
-    # TODO: need to decide how to publish messages from both of these events, the format might be differnet, maybe we want to
-    # publish from gazebo to virtual robots only, and the same from optiTrack to physical?
-    def get_robot_status_from_gazebo(self):
-        # TODO: how?
-        # In here we will subscribe to gazebo somehow, and upon receiving events, a callback
-        # will be issued that will publish the RobotStatus
-        pass
-
     def get_robot_status_from_opti_track(self):
         # TODO: how?
         # In here we will subscribe to optiTrack somehow, and upon receiving events, a callback
@@ -94,6 +86,7 @@ class Executer(Node):
         if task == 'STOP':
             self.get_logger().warn('Received STOP!')
             # Stop robot immediately
+            self._send_stop_command_to_robot(target_robot_id)
             pass
         elif task == 'START':
             self.get_logger().warn('Received START!')
@@ -104,58 +97,10 @@ class Executer(Node):
                     self._spawn_burger_bot_and_service(target_robot_id, path_target)
                 else:
                     self._send_next_point_to_robot(target_robot_id, path_target)
-            # This is another command in the robot's lifecycle, need to send him the command using the client
-            # Tell robot to stop performing current tasks and begin a new path
-            # command = self._get_twist_from_pose_pair(msg.path[0], msg.path[1])
-            # self._send_twist_message_base(command)
-            # self._send_twist_message_base(0)
-            # self._send_twist_message(0)
-            # self._send_twist_message_1(1)
         elif task == 'EXTEND':
             self.get_logger().warn('Received EXTEND!')
             # Tell the robot to continue with these added assignments after it is done with current tasks
             pass
-
-    def _send_twist_message_base(self, robot_id):
-        self.get_logger().warn('Sending twist message!')
-        cmd_vel_pub = self.create_publisher(Twist, f'/cmd_vel', 10)
-        twist_msg = Twist()
-        twist_msg.linear.x = 0.1
-        twist_msg.linear.y = 0.0
-        twist_msg.linear.z = 0.0
-        twist_msg.angular.x = 0.1
-        twist_msg.angular.y = 0.0
-        twist_msg.angular.z = 0.0
-        cmd_vel_pub.publish(twist_msg)
-
-    def _send_twist_message(self, robot_id):
-        self.get_logger().warn('Sending twist message!')
-        cmd_vel_pub = self.create_publisher(Twist, f'/robot{robot_id}/cmd_vel', 10)
-        twist_msg = Twist()
-        twist_msg.linear.x = 0.1
-        twist_msg.linear.y = 0.0
-        twist_msg.linear.z = 0.0
-        twist_msg.angular.x = 0.1
-        twist_msg.angular.y = 0.0
-        twist_msg.angular.z = 0.0
-        cmd_vel_pub.publish(twist_msg)
-
-    def _send_twist_message_1(self, robot_id):
-        self.get_logger().warn('Sending twist message!')
-        cmd_vel_pub = self.create_publisher(Twist, f'/robot{robot_id}/cmd_vel', 10)
-        twist_msg = Twist()
-        twist_msg.linear.x = 0.5
-        twist_msg.linear.y = 0.1
-        twist_msg.linear.z = 0.0
-        twist_msg.angular.x = 0.1
-        twist_msg.angular.y = 0.1
-        twist_msg.angular.z = 0.0
-        cmd_vel_pub.publish(twist_msg)
-
-    def _get_twist_from_pose_pair(self, pose1: PoseStamped, pose2: PoseStamped):
-        # Calculate a PID/twist message output from the pose inputs
-        result_twist = Twist()
-        return result_twist
 
     def _save_robot_initial_position(self, robot_id, pose_stamped: PoseStamped):
         initial_pose = Pose()
@@ -193,6 +138,13 @@ class Executer(Node):
         robot_client.next_step(x, y, 1)
         self.get_logger().info(f'Done current command')
 
+    def _send_stop_command_to_robot(self, target_robot_id: int):
+        robot_name = f'robot{target_robot_id}'
+        self.get_logger().warn(f'Stopping {robot_name}')
+        robot_client = ROBOT_CACHE[target_robot_id]["client"]
+        robot_client.next_step(0.0, 0.0, 2)
+        self.get_logger().info(f'Done stopping robot')
+
     def _get_position_by_name(self, name):
         self.executer_tracker.get_pose(name)
         position = None
@@ -201,10 +153,6 @@ class Executer(Node):
             if self.executer_tracker.future.done():
                 response: GetEntityState.Response = self.executer_tracker.future.result()
                 position = response.state.pose
-                # x = response.state.pose.position.x
-                # y = response.state.pose.position.y
-                # _, _, yaw = euler_from_quaternion(response.state.pose.orientation)
-
                 break
 
         return position
@@ -227,7 +175,6 @@ def main(args=None):
         multi_threaded_executer.spin()
     except KeyboardInterrupt:
         node.get_logger().info('Keyboard interrupt, shutting down.\n')
-    # rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
 

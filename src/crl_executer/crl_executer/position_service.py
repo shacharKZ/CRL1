@@ -66,8 +66,10 @@ class PositionService(Node):
 
         if request.action == 0:
             x, y, yaw = self.to_yaw(request.x, request.y)
-        else:
+        elif request.action == 1:
             x, y, yaw = self.drive_closest_to_point(request.x, request.y)
+        else:
+            self.stop()
 
         response.x = x
         response.y = y

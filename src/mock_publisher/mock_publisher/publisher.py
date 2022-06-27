@@ -13,6 +13,7 @@ PLAN_TOPIC = '/plan'
 PATH_TO_PLAN = './plans_to_run/plan2.txt'
 SCENE_NAME = None  # TODO
 
+
 class MockPublisher(Node):
     msg_publisher = None
 
@@ -45,6 +46,18 @@ class MockPublisher(Node):
             single_assignment.task = 'START'  # TODO
             full_message.plan.append(single_assignment)
         self.msg_publisher.publish(full_message)
+        #
+        # time.sleep(3)
+        # full_message = RobotPathAssignmentPlan()
+        # message = RobotPathAssignment()
+        # message.target_robot_id = 1
+        # message.task = 'STOP'
+        # full_message.plan.append(message)
+        # message1 = RobotPathAssignment()
+        # message1.target_robot_id = 3
+        # message1.task = 'STOP'
+        # full_message.plan.append(message1)
+        # self.msg_publisher.publish(full_message)
 
     def publish_random_message_to_topic3(self):
         message = RobotPathAssignment()
