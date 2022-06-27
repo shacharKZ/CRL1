@@ -62,7 +62,7 @@ class PositionService(Node):
     def service_callback(self, request, response):
         self.times_called += 1
         self.get_logger().info(f'Service got {request}.')
-        self.get_logger().info(f'Test service called {self.times_called} times.')
+        self.get_logger().info(f'Position service for {self.name} called {self.times_called} times.')
 
         if request.action == 0:
             x, y, yaw = self.to_yaw(request.x, request.y)

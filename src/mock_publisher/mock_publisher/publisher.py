@@ -1,4 +1,5 @@
 import time
+import random
 
 import rclpy
 from rclpy.node import Node
@@ -18,14 +19,44 @@ class MockPublisher(Node):
         timer_period = 1
         # self.timer = self.create_timer(timer_period, self.publish_mock_message_to_topic)
         self.publish_mock_message_to_topic0()
+        # self.publish_random_message_to_topic()
         # self.publish_mock_message_to_topic()
         # self.publish_mock_message_to_topic1()
+
+    def publish_random_message_to_topic(self):
+        message = RobotPathAssignment()
+        message.target_robot_id = random.randint(0, 1)
+        target = self.get_rand_float(random.randint(0, 3))
+        message.path.append(self.construct_pose_stamped(target, 0.0, 0.1))
+        # time.sleep(1)
+        # message.path.append(self.construct_pose_stamped(-1.0, 0.0, 0.1))
+        # # time.sleep(1)
+        # message.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
+        # # time.sleep(1)
+        # message.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
+        # # time.sleep(1)
+        # message.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
+        message.task = 'START'
+
+        self.msg_publisher.publish(message)
+
+    def get_rand_float(self, seed):
+        if seed == 0:
+            return 0.0
+        elif seed == 1:
+            return 0.5
+        elif seed == 2:
+            return 1.0
+        elif seed == 3:
+            return 1.5
 
     def publish_mock_message_to_topic0(self):
         self.get_logger().info('BP1')
         message0 = RobotPathAssignment()
         message0.target_robot_id = 0
         message0.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
+        message0.path.append(self.construct_pose_stamped(0.0, -0.5, 0.1))
+        message0.path.append(self.construct_pose_stamped(0.5, -0.5, 0.1))
         message0.path.append(self.construct_pose_stamped(0.5, 0.0, 0.1))
         # message0.path.append(self.construct_pose_stamped(-1.0, -1.0, 0.1))
         # message0.path.append(self.construct_pose_stamped(0.0, -1.0, 0.1))
@@ -36,8 +67,10 @@ class MockPublisher(Node):
 
         message1 = RobotPathAssignment()
         message1.target_robot_id = 1
-        message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
-        message1.path.append(self.construct_pose_stamped(1.5, 1.0, 0.1))
+        message1.path.append(self.construct_pose_stamped(0.0, 0.3, 0.1))
+        message1.path.append(self.construct_pose_stamped(0.0, 0.8, 0.1))
+        message1.path.append(self.construct_pose_stamped(0.5, 0.8, 0.1))
+        message1.path.append(self.construct_pose_stamped(0.5, 0.3, 0.1))
         # message1.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
         # message1.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
         # message1.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
@@ -49,6 +82,18 @@ class MockPublisher(Node):
         message1.task = 'START'
         self.msg_publisher.publish(message1)
         self.get_logger().info('BP3')
+
+        time.sleep(2)
+
+        message2 = RobotPathAssignment()
+        message2.target_robot_id = 2
+        message2.path.append(self.construct_pose_stamped(1.0, 0.3, 0.1))
+        message2.path.append(self.construct_pose_stamped(1.0, 0.8, 0.1))
+        message2.path.append(self.construct_pose_stamped(1.5, 0.8, 0.1))
+        message2.path.append(self.construct_pose_stamped(1.5, 0.3, 0.1))
+        message2.task = 'START'
+        self.msg_publisher.publish(message2)
+        self.get_logger().info('BP4')
 
     def publish_mock_message_to_topic(self):
         message = RobotPathAssignment()

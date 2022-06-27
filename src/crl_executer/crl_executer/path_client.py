@@ -1,4 +1,5 @@
 import rclpy
+from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 from multi_burger_interfaces.srv import Position
 from time import sleep
@@ -23,7 +24,7 @@ class PathClient(Node):
         self.req.action = act
 
         self.future = self.client.call_async(self.req)
-        rclpy.spin_until_future_complete(self, self.future)
+        rclpy.spin_until_future_complete(self, self.future, MultiThreadedExecutor())
         if self.future.result() is not None:
             print('response: %r' % self.future.result())
 
