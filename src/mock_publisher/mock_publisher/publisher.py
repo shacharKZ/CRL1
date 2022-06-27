@@ -20,13 +20,7 @@ class MockPublisher(Node):
     def __init__(self):
         super().__init__('MockPublisher')
         self.msg_publisher = self.create_publisher(RobotPathAssignmentPlan, PLAN_TOPIC, 10)
-        # self.publish_mock_message_to_topic()
-        timer_period = 1
-        # self.timer = self.create_timer(timer_period, self.publish_mock_message_to_topic)
         self.publish_mock_message_to_topic()
-        # self.publish_random_message_to_topic()
-        # self.publish_mock_message_to_topic()
-        # self.publish_mock_message_to_topic1()
 
     def publish_mock_message_to_topic(self):
         full_message = RobotPathAssignmentPlan()
@@ -43,7 +37,7 @@ class MockPublisher(Node):
                 task_type = single_task[2]  # TODO
                 custom_msg = single_task[3]  # TODO
                 single_assignment.path.append(self.construct_pose_stamped(x, y, 0.1))
-            single_assignment.task = 'START'  # TODO
+            single_assignment.task = 'STARfutureT'  # TODO
             full_message.plan.append(single_assignment)
         self.msg_publisher.publish(full_message)
         #
@@ -59,32 +53,6 @@ class MockPublisher(Node):
         # full_message.plan.append(message1)
         # self.msg_publisher.publish(full_message)
 
-    def publish_random_message_to_topic3(self):
-        message = RobotPathAssignment()
-        message.target_robot_id = random.randint(0, 1)
-        target = self.get_rand_float(random.randint(0, 3))
-        message.path.append(self.construct_pose_stamped(target, 0.0, 0.1))
-        # time.sleep(1)
-        # message.path.append(self.construct_pose_stamped(-1.0, 0.0, 0.1))
-        # # time.sleep(1)
-        # message.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
-        # # time.sleep(1)
-        # message.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
-        # # time.sleep(1)
-        # message.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
-        message.task = 'START'
-
-        self.msg_publisher.publish(message)
-
-    def get_rand_float(self, seed):
-        if seed == 0:
-            return 0.0
-        elif seed == 1:
-            return 0.5
-        elif seed == 2:
-            return 1.0
-        elif seed == 3:
-            return 1.5
 
     def publish_mock_message_to_topic0(self):
         self.get_logger().info('BP1')
@@ -134,32 +102,6 @@ class MockPublisher(Node):
         # self.msg_publisher.publish(message2)
         self.get_logger().info('BP4')
         message.plan = [message2]
-        self.msg_publisher.publish(message)
-
-    def publish_mock_message_to_topic5(self):
-        message = RobotPathAssignment()
-        message.target_robot_id = 0
-        message.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
-        # time.sleep(1)
-        message.path.append(self.construct_pose_stamped(-1.0, 0.0, 0.1))
-        # time.sleep(1)
-        message.path.append(self.construct_pose_stamped(1.0, 1.0, 0.1))
-        # time.sleep(1)
-        message.path.append(self.construct_pose_stamped(0.0, 1.0, 0.1))
-        # time.sleep(1)
-        message.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
-        message.task = 'START'
-
-        self.msg_publisher.publish(message)
-
-    def publish_mock_message_to_topic1(self):
-        message = RobotPathAssignment()
-        message.target_robot_id = 1
-        message.path.append(self.construct_pose_stamped(-1.0, 2.0, 0.1))
-        time.sleep(1)
-        message.path.append(self.construct_pose_stamped(-2.0, 2.0, 0.1))
-        message.task = 'START'
-
         self.msg_publisher.publish(message)
 
     def construct_pose_stamped(self, px, py, pz):

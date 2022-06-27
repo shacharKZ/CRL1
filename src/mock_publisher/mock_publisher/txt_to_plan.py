@@ -36,8 +36,8 @@ def parse_txt_to_plan(plan_path):
 def generate_plan(n_entities, path_out=None):
     entities_map = {}
     for i in range(n_entities):
-        x = float(random.randint(-10, 10))
-        y = float(random.randint(-10, 10))
+        x = float(random.randint(-3, 3))
+        y = float(random.randint(-3, 3))
         plan = [[x, y, "start", ""]]
         task_number = random.randint(1, 20)
         for j in range(task_number):
@@ -57,9 +57,9 @@ def generate_plan(n_entities, path_out=None):
 
 
 def main():
-    # print(generate_plan(n_entities=4, path_out='../../../plans_to_run/plan2.txt'))
-    print('plan0 is:')
-    print(parse_txt_to_plan('../../../plans_to_run/plan0.txt'))
+    print(generate_plan(n_entities=6, path_out='../../../plans_to_run/plan2.txt'))
+    # print('plan0 is:')
+    # print(parse_txt_to_plan('../../../plans_to_run/plan0.txt'))
 
 
 if __name__ == '__main__':
