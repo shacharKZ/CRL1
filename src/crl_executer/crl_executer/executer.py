@@ -1,4 +1,3 @@
-import multiprocessing
 import subprocess
 from typing import List
 
@@ -10,8 +9,6 @@ from geometry_msgs.msg import PoseStamped, Pose, Twist
 from goal_status_interface.msg import GoalStatus
 from robot_status_interface.msg import RobotStatus
 from robot_path_assignment_interface.msg import RobotPathAssignment, RobotPathAssignmentPlan
-from crl_executer.spawn_burger import SpawnBurger
-from crl_executer.position_service import PositionService
 from crl_executer.path_client import PathClient
 
 PLAN_TOPIC = '/plan'
