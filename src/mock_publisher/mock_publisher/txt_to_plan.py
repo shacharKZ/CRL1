@@ -21,15 +21,14 @@ def parse_txt_to_plan(plan_path):
                 y = float(line[2])
             except:
                 raise "plan did not provide position x or y as numeric coordinates"
-            task_type = "move" if len(line) < 4 else line[3]
-            msg_to_goal = "" if len(line) < 5 else line[4]
+            goal_message = "" if len(line) < 4 else line[3]
             if robot_num in entities_map:
-                entities_map[robot_num].append([x, y, task_type, msg_to_goal])
+                entities_map[robot_num].append([x, y, goal_message])
             else:
                 if task_type != 'start':
                     # warnings.warn(f'{robot_num} first task is {task_type} and not "start". auto change it to "start"')
                     task_type = 'start'
-                entities_map[robot_num] = [[x, y, task_type, msg_to_goal]]
+                entities_map[robot_num] = [[x, y, goal_message]]
     return entities_map
 
 
@@ -38,26 +37,26 @@ def generate_plan(n_entities, path_out=None):
     for i in range(n_entities):
         x = float(random.randint(-3, 3))
         y = float(random.randint(-3, 3))
-        plan = [[x, y, "start", ""]]
+        plan = [[x, y, "start"]]
         task_number = random.randint(1, 20)
         for j in range(task_number):
             x = x + random.randint(-3, 3)
             y = y + random.randint(-3, 3)
-            plan.append([x, y, "", ""])
+            plan.append([x, y, ""])
         entities_map[i] = plan
     if path_out is not None and path_out != "":
         with open(path_out, 'w') as f:
             for robot_name in entities_map:
                 robot_plan = entities_map[robot_name]
-                print(robot_plan)
+                # print(robot_plan)
                 for task in robot_plan:
-                    print(task)
+                    # print(task)
                     f.write(f'{robot_name} {task[0]} {task[1]}\n')
     return entities_map
 
 
 def main():
-    print(generate_plan(n_entities=6, path_out='../../../plans_to_run/plan2.txt'))
+    print(generate_plan(n_entities=10, path_out='../../../plans_to_run/plan2.txt'))
     # print('plan0 is:')
     # print(parse_txt_to_plan('../../../plans_to_run/plan0.txt'))
 
