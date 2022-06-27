@@ -1,5 +1,6 @@
 import multiprocessing
 import subprocess
+from typing import List
 
 import rclpy
 from rclpy.callback_groups import ReentrantCallbackGroup
@@ -14,6 +15,7 @@ from crl_executer.position_service import PositionService
 from crl_executer.path_client import PathClient
 
 PLAN_TOPIC = '/plan'
+INTERNAL_PLAN_TOPIC = '/planForwarder'
 ROBOT_STATUS_TOPIC = '/robotStatus'
 GOAL_STATUS_TOPIC = '/goalStatus'
 
@@ -30,9 +32,13 @@ class Executer(Node):
         self.expose_goal_status_topic()
 
     def subscribe_to_mapf_plan_topic(self):
-        my_callback_group = ReentrantCallbackGroup()
-        self.plan_input_topic = self.create_subscription(RobotPathAssignment, PLAN_TOPIC, self.send_plan_to_robot,
-                                                         10, callback_group=my_callback_group)
+        single_robot_plan_sender_cb_group = ReentrantCallbackGroup()
+        self.plan_input_topic = self.create_subscription(RobotPathAssignmentPlan, PLAN_TOPIC, self.handle_plan,
+                                                         10)
+        self.internal_plan_topic = self.create_publisher(RobotPathAssignment, INTERNAL_PLAN_TOPIC, 10)
+        self.internal_plan_topic_handler = self.create_subscription(RobotPathAssignment, INTERNAL_PLAN_TOPIC,
+                                                                    self.send_plan_to_robot, 10,
+                                                                    callback_group=single_robot_plan_sender_cb_group)
 
     def expose_robot_status_topic(self):
         self.robot_status_topic = self.create_publisher(RobotStatus, ROBOT_STATUS_TOPIC, 10)
@@ -92,11 +98,16 @@ class Executer(Node):
         # self.goal_status_topic.publish(msg)
         pass
 
+    def handle_plan(self, msg):
+        self.get_logger().info('Received a plan!')
+        robot_assignments: List[RobotPathAssignment] = msg.plan
+        for assignment in robot_assignments:
+            self.internal_plan_topic.publish(assignment)
+
     def send_plan_to_robot(self, msg):
         # Assumptions
         # 1. The first task assignment for a robot must be START
         # 2. The first pose stamped in the first task assignment is the initial location of the robot
-        # TODO: figure out how to correctly send plans to robots (NAV2/TWIST/something else?)
         target_robot_id = msg.target_robot_id
         self.get_logger().warn(f'Received task for robot {target_robot_id}')
         task = msg.task

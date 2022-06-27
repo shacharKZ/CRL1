@@ -6,7 +6,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Quaternion
 from goal_status_interface.msg import GoalStatus
 from robot_status_interface.msg import RobotStatus
-from robot_path_assignment_interface.msg import RobotPathAssignment
+from robot_path_assignment_interface.msg import RobotPathAssignment, RobotPathAssignmentPlan
 
 PLAN_TOPIC = '/plan'
 
@@ -15,7 +15,7 @@ class MockPublisher(Node):
 
     def __init__(self):
         super().__init__('MockPublisher')
-        self.msg_publisher = self.create_publisher(RobotPathAssignment, PLAN_TOPIC, 10)
+        self.msg_publisher = self.create_publisher(RobotPathAssignmentPlan, PLAN_TOPIC, 10)
         # self.publish_mock_message_to_topic()
         timer_period = 1
         # self.timer = self.create_timer(timer_period, self.publish_mock_message_to_topic)
@@ -53,6 +53,7 @@ class MockPublisher(Node):
 
     def publish_mock_message_to_topic0(self):
         self.get_logger().info('BP1')
+        message = RobotPathAssignmentPlan()
         message0 = RobotPathAssignment()
         message0.target_robot_id = 0
         message0.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
@@ -63,7 +64,7 @@ class MockPublisher(Node):
         # message0.path.append(self.construct_pose_stamped(0.0, -1.0, 0.1))
         # message0.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
         message0.task = 'START'
-        self.msg_publisher.publish(message0)
+        # self.msg_publisher.publish(message0)
         self.get_logger().info('BP2')
 
         message1 = RobotPathAssignment()
@@ -81,8 +82,10 @@ class MockPublisher(Node):
         # message1.path.append(self.construct_pose_stamped(1.0, 0.0, 0.1))
 
         message1.task = 'START'
-        self.msg_publisher.publish(message1)
+        # self.msg_publisher.publish(message1)
         self.get_logger().info('BP3')
+        message.plan = [message0, message1]
+        self.msg_publisher.publish(message)
 
         time.sleep(2)
 
@@ -93,8 +96,10 @@ class MockPublisher(Node):
         message2.path.append(self.construct_pose_stamped(1.5, 0.8, 0.1))
         message2.path.append(self.construct_pose_stamped(1.5, 0.3, 0.1))
         message2.task = 'START'
-        self.msg_publisher.publish(message2)
+        # self.msg_publisher.publish(message2)
         self.get_logger().info('BP4')
+        message.plan = [message2]
+        self.msg_publisher.publish(message)
 
     def publish_mock_message_to_topic(self):
         message = RobotPathAssignment()
