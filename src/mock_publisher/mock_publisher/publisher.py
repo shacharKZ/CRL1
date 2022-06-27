@@ -7,8 +7,11 @@ from geometry_msgs.msg import PoseStamped, Quaternion
 from goal_status_interface.msg import GoalStatus
 from robot_status_interface.msg import RobotStatus
 from robot_path_assignment_interface.msg import RobotPathAssignment, RobotPathAssignmentPlan
+from mock_publisher.txt_to_plan import parse_txt_to_plan
 
 PLAN_TOPIC = '/plan'
+PATH_TO_PLAN = './plans_to_run/plan2.txt'
+SCENE_NAME = None  # TODO
 
 class MockPublisher(Node):
     msg_publisher = None
@@ -19,12 +22,31 @@ class MockPublisher(Node):
         # self.publish_mock_message_to_topic()
         timer_period = 1
         # self.timer = self.create_timer(timer_period, self.publish_mock_message_to_topic)
-        self.publish_mock_message_to_topic0()
+        self.publish_mock_message_to_topic()
         # self.publish_random_message_to_topic()
         # self.publish_mock_message_to_topic()
         # self.publish_mock_message_to_topic1()
 
-    def publish_random_message_to_topic(self):
+    def publish_mock_message_to_topic(self):
+        full_message = RobotPathAssignmentPlan()
+        full_plan = parse_txt_to_plan(plan_path=PATH_TO_PLAN)
+        # TODO set up map/scene
+        for robot_entity in full_plan:
+            robot_plan = full_plan[robot_entity]
+            self.get_logger().info(f'plan for robot={robot_entity} is {robot_plan}')
+            single_assignment = RobotPathAssignment()
+            single_assignment.target_robot_id = robot_entity
+            for single_task in robot_plan:
+                x = single_task[0]
+                y = single_task[1]
+                task_type = single_task[2]  # TODO
+                custom_msg = single_task[3]  # TODO
+                single_assignment.path.append(self.construct_pose_stamped(x, y, 0.1))
+            single_assignment.task = 'START'  # TODO
+            full_message.plan.append(single_assignment)
+        self.msg_publisher.publish(full_message)
+
+    def publish_random_message_to_topic3(self):
         message = RobotPathAssignment()
         message.target_robot_id = random.randint(0, 1)
         target = self.get_rand_float(random.randint(0, 3))
@@ -101,7 +123,7 @@ class MockPublisher(Node):
         message.plan = [message2]
         self.msg_publisher.publish(message)
 
-    def publish_mock_message_to_topic(self):
+    def publish_mock_message_to_topic5(self):
         message = RobotPathAssignment()
         message.target_robot_id = 0
         message.path.append(self.construct_pose_stamped(0.0, 0.0, 0.1))
