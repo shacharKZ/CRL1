@@ -39,7 +39,6 @@ class MockPublisher(Node):
             full_message.plan.append(single_assignment)
         self.msg_publisher.publish(full_message)
 
-
     def construct_pose_stamped(self, px, py, pz):
         pose = PoseStamped()
         pose.header.frame_id = 'map'
@@ -51,7 +50,6 @@ class MockPublisher(Node):
         pose.pose.orientation.y = 1.0
         pose.pose.orientation.z = 1.0
         pose.pose.orientation.w = 1.0
-
         return pose
 
 

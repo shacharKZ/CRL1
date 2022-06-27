@@ -9,23 +9,20 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
-def generate_launch_description():
+def generate_launch_description(map_name='empty_world.world'):
+    if map_name not in ['empty_world.world', 'turtlebot3_world.world']:
+        raise(f"unfamiliar map '{map_name}' was given to gazebo in 'generate_launch_description'")
     # Sync robots and gazebo server time
     use_sim_time = LaunchConfiguration('use_sim_time', default='True')
 
     # Find Gazebo server directory
     pkg_gazebo_ros = get_package_share_directory('gazebo_ros')
 
-    # world = os.path.join(
-    #     get_package_share_directory('turtlebot3_gazebo'),
-    #     'worlds',
-    #     'turtlebot3_world.world'
-    # )
-
+    # chose the map to load (map_name)
     world = os.path.join(
         get_package_share_directory('turtlebot3_gazebo'),
         'worlds',
-        'empty_world.world'
+        map_name
     )
 
     gazebo = IncludeLaunchDescription(
