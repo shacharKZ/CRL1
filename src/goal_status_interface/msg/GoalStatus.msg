@@ -1,2 +1,2 @@
 int64 goal_id
-geometry_msgs/PoseStamped current_location
+string status

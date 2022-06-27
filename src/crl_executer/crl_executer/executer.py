@@ -31,7 +31,6 @@ class Executer(Node):
         self.expose_robot_status_topic()
         self.expose_goal_status_topic()
         self.robot_status_timer = self.create_timer(TIMER_PERIOD, self.publish_robot_status)
-        self.goal_status_timer = self.create_timer(TIMER_PERIOD, self.publish_goal_status)
         self.executer_tracker = PositionTracker('executer_tracker')
 
     def subscribe_to_mapf_plan_topic(self):
@@ -60,9 +59,12 @@ class Executer(Node):
             self.get_logger().info(f'Publishing status of robot {robot_id}')
             self.robot_status_topic.publish(message)
 
-    def publish_goal_status(self):
-        # Query all goal locations and send them over the topic
-        pass
+    def publish_goal_status(self, goal_id, status):
+        self.get_logger().info(f'Publishing status: {status} of goal {goal_id}')
+        message = GoalStatus()
+        message.goal_id = int(goal_id)
+        message.status = status
+        self.goal_status_topic.publish(message)
 
     def get_robot_status_from_opti_track(self):
         # TODO: how?
@@ -90,17 +92,19 @@ class Executer(Node):
             pass
         elif task == 'START':
             self.get_logger().warn('Received START!')
-            for path_target in msg.path:
+            for path_target, goal_message in zip(msg.path, msg.goal_message):
                 if target_robot_id not in ROBOT_CACHE:
                     # This is the first message about this robot, and the robot has no initial position, so the first pose stamped is the robots' initial position
                     self._save_robot_initial_position(target_robot_id, path_target)
                     self._spawn_burger_bot_and_service(target_robot_id, path_target)
                 else:
                     self._send_next_point_to_robot(target_robot_id, path_target)
-        elif task == 'EXTEND':
-            self.get_logger().warn('Received EXTEND!')
-            # Tell the robot to continue with these added assignments after it is done with current tasks
-            pass
+
+                if 'finish' in goal_message:
+                    self._announce_robot_goal_finished(target_robot_id)
+                elif 'goal' in goal_message:
+                    goal_id = goal_message.split('-')[1]
+                    self._announce_new_robot_goal(target_robot_id, goal_id)
 
     def _save_robot_initial_position(self, robot_id, pose_stamped: PoseStamped):
         initial_pose = Pose()
@@ -108,11 +112,14 @@ class Executer(Node):
         initial_pose.orientation = pose_stamped.pose.orientation
         ROBOT_CACHE[robot_id] = {"initial_pose": initial_pose}
 
-    def _save_robot_current_position(self, robot_id, pose_stamped: PoseStamped):
-        initial_pose = Pose()
-        initial_pose.position = pose_stamped.pose.position
-        initial_pose.orientation = pose_stamped.pose.orientation
-        ROBOT_CACHE[robot_id] = initial_pose
+    def _announce_new_robot_goal(self, robot_id, goal_id):
+        ROBOT_CACHE[robot_id]['current_goal'] = goal_id
+        self.publish_goal_status(goal_id, 'Started')
+
+    def _announce_robot_goal_finished(self, robot_id):
+        goal_id = ROBOT_CACHE[robot_id]['current_goal']
+        ROBOT_CACHE[robot_id]['current_goal'] = -1
+        self.publish_goal_status(goal_id, 'Finished')
 
     def _spawn_burger_bot_and_service(self, target_robot_id: int, initial_position: PoseStamped):
         robot_name = f'robot{target_robot_id}'
