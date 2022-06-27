@@ -39,7 +39,7 @@ class Executer(Node):
                                                          10)
         self.internal_plan_topic = self.create_publisher(RobotPathAssignment, INTERNAL_PLAN_TOPIC, 10)
         self.internal_plan_topic_handler = self.create_subscription(RobotPathAssignment, INTERNAL_PLAN_TOPIC,
-                                                                    self.send_plan_to_robot, 10,
+                                                                    self._send_plan_to_robot, 10,
                                                                     callback_group=single_robot_plan_sender_cb_group)
 
     def expose_robot_status_topic(self):
@@ -66,7 +66,7 @@ class Executer(Node):
         message.status = status
         self.goal_status_topic.publish(message)
 
-    def get_robot_status_from_opti_track(self):
+    def _get_robot_status_from_opti_track(self):
         # TODO: how?
         # In here we will subscribe to optiTrack somehow, and upon receiving events, a callback
         # will be issued that will publish the RobotStatus
@@ -78,7 +78,7 @@ class Executer(Node):
         for assignment in robot_assignments:
             self.internal_plan_topic.publish(assignment)
 
-    def send_plan_to_robot(self, msg):
+    def _send_plan_to_robot(self, msg):
         # Assumptions
         # 1. The first task assignment for a robot must be START
         # 2. The first pose stamped in the first task assignment is the initial location of the robot
