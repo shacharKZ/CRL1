@@ -2,6 +2,8 @@ import multiprocessing
 import subprocess
 
 import rclpy
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Pose, Twist
 from goal_status_interface.msg import GoalStatus
@@ -28,8 +30,9 @@ class Executer(Node):
         self.expose_goal_status_topic()
 
     def subscribe_to_mapf_plan_topic(self):
+        my_callback_group = ReentrantCallbackGroup()
         self.plan_input_topic = self.create_subscription(RobotPathAssignment, MAPF_PLAN_TOPIC, self.send_plan_to_robot,
-                                                         10)
+                                                         10, callback_group=my_callback_group)
 
     def expose_robot_status_topic(self):
         self.robot_status_topic = self.create_publisher(RobotStatus, ROBOT_STATUS_TOPIC, 10)
@@ -95,6 +98,7 @@ class Executer(Node):
         # 2. The first pose stamped in the first task assignment is the initial location of the robot
         # TODO: figure out how to correctly send plans to robots (NAV2/TWIST/something else?)
         target_robot_id = msg.target_robot_id
+        self.get_logger().warn(f'Received task for robot {target_robot_id}')
         task = msg.task
         if task == 'STOP':
             self.get_logger().warn('Received STOP!')
@@ -191,7 +195,7 @@ class Executer(Node):
         x = next_position.pose.position.x
         y = next_position.pose.position.y
         z = next_position.pose.position.z
-        self.get_logger().info(f'Sending {robot_name} to position {x}, {y}, {z}')
+        self.get_logger().warn(f'Sending {robot_name} to position {x}, {y}, {z}')
         robot_client = ROBOT_CACHE[target_robot_id]["client"]
         robot_client.next_step(x, y, 0)
         robot_client.next_step(x, y, 0)  # solve the incapable of walking 180 deg from your position
@@ -201,8 +205,15 @@ class Executer(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+    multi_threaded_executer = MultiThreadedExecutor()
     node = Executer()
-    rclpy.spin(node)
+    multi_threaded_executer.add_node(node)
+    try:
+        node.get_logger().info('Starting Executer Node in multithreaded mode.\n')
+        multi_threaded_executer.spin()
+    except KeyboardInterrupt:
+        node.get_logger().info('Keyboard interrupt, shutting down.\n')
+    # rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
 
