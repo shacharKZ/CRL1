@@ -8,7 +8,8 @@ from robot_path_assignment_interface.msg import RobotPathAssignment, RobotPathAs
 from mock_publisher.txt_to_plan import parse_txt_to_plan
 
 PLAN_TOPIC = '/plan'
-PATH_TO_PLAN = './plans_to_run/plan2.txt'
+PATH_TO_PLAN = './plans_to_run/plan3_empty_world_dance.txt'
+# PATH_TO_PLAN = './plans_to_run/test0.txt'
 SCENE_NAME = None  # TODO
 
 

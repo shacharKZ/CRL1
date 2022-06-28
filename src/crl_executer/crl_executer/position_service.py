@@ -11,10 +11,10 @@ from math import pi
 
 from crl_executer.transformations import euler_from_quaternion, yaw_from_coordinates
 
-LINEAR_VELOCITY = 0.1  # m/s
-ANGULAR_VELOCITY = pi / 10  # rad/s
-EPSILON = 1e-3
-POLL_RATE = 1e-4  # sec
+LINEAR_VELOCITY = 0.25  # originally 0.1  # m/s
+ANGULAR_VELOCITY = pi / 10  # originally was pi / 10  # rad/s
+EPSILON = 2e-3  # originally 1e-3
+POLL_RATE = (1e-4)/2  # originally 1e-4# sec
 
 
 class PositionTracker(Node):
@@ -79,18 +79,16 @@ class PositionService(Node):
         return response
 
     def to_yaw(self, x_target, y_target):
-
         x, y, yaw = self.get_position(self.name)
         yaw_target = yaw_from_coordinates(x_target - x, y_target - y)
+        if abs(yaw - yaw_target) < EPSILON:
+            return x, y, yaw
 
         turn = self.turn_right
         delta = (yaw - yaw_target) % (2 * pi)
         if delta >= pi:
             turn = self.turn_left
-
-        if abs(yaw - yaw_target) > EPSILON:
-            turn()
-
+        turn()
         while (abs(yaw - yaw_target) > EPSILON) or \
                 (abs(yaw % (2 * pi) - yaw_target % (2 * pi)) > EPSILON):
             sleep(POLL_RATE)
