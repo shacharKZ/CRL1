@@ -29,6 +29,92 @@ def parse_txt_to_plan(plan_path):
     return entities_map
 
 
+def dict_plan_to_txt(entities_map, path_out):
+    with open(path_out, 'w') as f:
+        for robot_name in entities_map:
+            robot_plan = entities_map[robot_name]
+            for task in robot_plan:
+                f.write(f'{robot_name} {task[0]} {task[1]}\n')
+
+
+def move_square(x, y, leg_len, clockwise=True, delta=0.0):
+    plan = [[x+delta, y, '']]
+    if delta != 0:
+        plan.append([x+delta, y, ''])
+    if clockwise:
+        plan.append([x+leg_len, y+delta, ''])
+        plan.append([x+leg_len-delta, y+leg_len, ''])
+        plan.append([x, y+leg_len-delta, ''])
+        plan.append([x, y, ''])
+    plan.reverse()
+
+    return plan
+
+
+def generate_dance0(path_out=None):
+    entities_map = {}
+    for i in range(10):
+        x = 0
+        y = i/2.0 - 7.0
+        flag_clockwise = i % 2 == 0
+        plan = move_square(x, y, i+0.5, flag_clockwise)
+        entities_map[i] = plan
+    if path_out is not None and path_out != "":
+        with open(path_out, 'w') as f:
+            for robot_name in entities_map:
+                robot_plan = entities_map[robot_name]
+                for task in robot_plan:
+                    f.write(f'{robot_name} {task[0]} {task[1]}\n')
+    return entities_map
+
+
+def generate_race_condition_test(n=3, out_path=None):
+    entities_map = {}
+    for i in range(n):
+        plan = [[i, 0, ''], [i+1, 0, ''], [i-1, 0, '']]
+        entities_map[i] = plan
+
+    if out_path is not None:
+        dict_plan_to_txt(entities_map, out_path)
+
+
+def generate_dance2(n=2, out_path=None):
+    entities_map = {}
+    for i in range(n):
+        for j in range(n):
+            x = i
+            y = j
+            plan = move_square(x, y, 1, delta=0.5) + move_square(x, y, -1)
+            entities_map[i*10+j] = plan
+
+    for i in range(n):
+        for j in range(n):
+            x = i+0.5
+            y = j+0.5
+            plan = move_square(x, y, -1)
+            entities_map[i*10+j+100] = plan
+
+    if out_path is not None:
+        dict_plan_to_txt(entities_map, out_path)
+
+
+def generate_dance1(path_out=None):
+    entities_map = {}
+    for i in range(20):
+        x = -10 + i
+        y = 0
+        plan = [[x, y, '']]
+        even_flag = i % 2 == 0
+        tmp = 1 if even_flag else -1
+        y += tmp
+        plan.append([x, y, ''])
+    if path_out is not None and path_out != "":
+        dict_plan_to_txt(entities_map, path_out)
+
+    return entities_map
+
+
+
 def generate_plan(n_entities, path_out=None):
     entities_map = {}
     for i in range(n_entities):
@@ -42,18 +128,15 @@ def generate_plan(n_entities, path_out=None):
             plan.append([x, y, ""])
         entities_map[i] = plan
     if path_out is not None and path_out != "":
-        with open(path_out, 'w') as f:
-            for robot_name in entities_map:
-                robot_plan = entities_map[robot_name]
-                # print(robot_plan)
-                for task in robot_plan:
-                    # print(task)
-                    f.write(f'{robot_name} {task[0]} {task[1]}\n')
+        dict_plan_to_txt(entities_map, path_out)
     return entities_map
 
 
 def main():
-    print(generate_plan(n_entities=10, path_out='../../../plans_to_run/plan2.txt'))
+    # generate_race_condition_test(n=5, out_path='../../../plans_to_run/test2.txt')
+    generate_dance2(out_path='../../../plans_to_run/dance4.txt')
+    # generate_dance(path_out='../../../plans_to_run/dance1.txt')
+    # print(generate_plan(n_entities=10, path_out='../../../plans_to_run/plan2.txt'))
     # print('plan0 is:')
     # print(parse_txt_to_plan('../../../plans_to_run/plan0.txt'))
 

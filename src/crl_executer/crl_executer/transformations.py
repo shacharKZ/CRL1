@@ -57,7 +57,10 @@ def quaternion_from_euler(roll, pitch, yaw):
 
 
 def yaw_from_coordinates(x, y):
-    theta = np.arctan(abs(y / x))
+    if x == 0:  # TODO still testing this
+        theta = np.pi/2
+    else:
+        theta = np.arctan(abs(y / x))
     if x < 0:
         theta = np.pi - theta
     if y < 0:

@@ -22,7 +22,7 @@ BASE_ROBOT_TOPIC = '/robot/'
 
 ROBOT_CACHE = {}
 TIMER_PERIOD = 5
-
+QUEUE_SIZE = 20
 
 class Executer(Node):
     def __init__(self):
@@ -36,31 +36,31 @@ class Executer(Node):
     def subscribe_to_mapf_plan_topic(self):
         single_robot_plan_sender_cb_group = ReentrantCallbackGroup()
         self.plan_input_topic = self.create_subscription(RobotPathAssignmentPlan, PLAN_TOPIC, self.handle_plan,
-                                                         10)
-        self.internal_plan_topic = self.create_publisher(RobotPathAssignment, INTERNAL_PLAN_TOPIC, 10)
+                                                         QUEUE_SIZE)
+        self.internal_plan_topic = self.create_publisher(RobotPathAssignment, INTERNAL_PLAN_TOPIC, QUEUE_SIZE)
         self.internal_plan_topic_handler = self.create_subscription(RobotPathAssignment, INTERNAL_PLAN_TOPIC,
-                                                                    self._send_plan_to_robot, 10,
+                                                                    self._send_plan_to_robot, QUEUE_SIZE,
                                                                     callback_group=single_robot_plan_sender_cb_group)
 
     def expose_robot_status_topic(self):
-        self.robot_status_topic = self.create_publisher(RobotStatus, ROBOT_STATUS_TOPIC, 10)
+        self.robot_status_topic = self.create_publisher(RobotStatus, ROBOT_STATUS_TOPIC, QUEUE_SIZE)
 
     def expose_goal_status_topic(self):
-        self.goal_status_topic = self.create_publisher(GoalStatus, GOAL_STATUS_TOPIC, 10)
+        self.goal_status_topic = self.create_publisher(GoalStatus, GOAL_STATUS_TOPIC, QUEUE_SIZE)
 
     def publish_robot_status(self):
         # Query all robot locations and send them over the topic
-        self.get_logger().info('Publishing all robot status')
+        self.get_logger().info('Publishing all robot status')  # TODO
         for robot_id in ROBOT_CACHE.keys():
             position = self._get_position_by_name(f"robot{robot_id}")
             message = RobotStatus()
             message.robot_id = robot_id
             message.current_location = self._construct_pose_stamped(position)
-            self.get_logger().info(f'Publishing status of robot {robot_id}')
+            # self.get_logger().info(f'Publishing status of robot {robot_id}')  # TODO
             self.robot_status_topic.publish(message)
 
     def publish_goal_status(self, goal_id, status):
-        self.get_logger().info(f'Publishing status: {status} of goal {goal_id}')
+        # self.get_logger().info(f'Publishing status: {status} of goal {goal_id}')  # TODO
         message = GoalStatus()
         message.goal_id = int(goal_id)
         message.status = status
@@ -138,19 +138,19 @@ class Executer(Node):
         x = next_position.pose.position.x
         y = next_position.pose.position.y
         z = next_position.pose.position.z
-        self.get_logger().warn(f'Sending {robot_name} to position {x}, {y}, {z}')
+        self.get_logger().warn(f'Start sending {robot_name} to position {x}, {y}, {z}')
         robot_client = ROBOT_CACHE[target_robot_id]["client"]
         robot_client.next_step(x, y, 0)
-        robot_client.next_step(x, y, 0)  # solve the incapable of walking 180 deg from your position
+        # robot_client.next_step(x, y, 0)  # solve the incapable of walking 180 deg from your position
         robot_client.next_step(x, y, 1)
-        self.get_logger().info(f'Done current command')
+        self.get_logger().info(f'Finish sending {robot_name} to position {x}, {y}, {z}')
 
     def _send_stop_command_to_robot(self, target_robot_id: int):
         robot_name = f'robot{target_robot_id}'
         self.get_logger().warn(f'Stopping {robot_name}')
         robot_client = ROBOT_CACHE[target_robot_id]["client"]
         robot_client.next_step(0.0, 0.0, 2)
-        self.get_logger().info(f'Done stopping robot')
+        self.get_logger().info(f'Done stopping {robot_name}')
 
     def _get_position_by_name(self, name):
         self.executer_tracker.get_pose(name)

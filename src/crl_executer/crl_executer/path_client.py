@@ -22,12 +22,14 @@ class PathClient(Node):
         self.req.x = float(x)
         self.req.y = float(y)
         self.req.action = act
+        # print(f'{self.name}:)a) i got {self.req.action}')
 
         self.future = self.client.call_async(self.req)
         rclpy.spin_until_future_complete(self, self.future, MultiThreadedExecutor())
         if self.future.result() is not None:
-            print('response: %r' % self.future.result())
+            print(f'{self.name}: response: {self.future.result()}')
 
+        # print(f'{self.name}:)b) i finish {self.req.action}')
         sleep(0.1)
 
 

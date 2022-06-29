@@ -8,9 +8,11 @@ from robot_path_assignment_interface.msg import RobotPathAssignment, RobotPathAs
 from mock_publisher.txt_to_plan import parse_txt_to_plan
 
 PLAN_TOPIC = '/plan'
-PATH_TO_PLAN = './plans_to_run/plan3_empty_world_dance.txt'
-# PATH_TO_PLAN = './plans_to_run/test0.txt'
+# PATH_TO_PLAN = './plans_to_run/plan3_empty_world_dance.txt'
+PATH_TO_PLAN = './plans_to_run/test0.txt'
+# PATH_TO_PLAN = './plans_to_run/dance4.txt'
 SCENE_NAME = None  # TODO
+QUEUE_SIZE = 30  # uses also as a bottleneck for the number of robots in scene (QUEUE_SIZE-2)
 
 
 class MockPublisher(Node):
@@ -18,7 +20,7 @@ class MockPublisher(Node):
 
     def __init__(self):
         super().__init__('MockPublisher')
-        self.msg_publisher = self.create_publisher(RobotPathAssignmentPlan, PLAN_TOPIC, 10)
+        self.msg_publisher = self.create_publisher(RobotPathAssignmentPlan, PLAN_TOPIC, QUEUE_SIZE)
         self.publish_mock_message_to_topic()
 
     def publish_mock_message_to_topic(self):

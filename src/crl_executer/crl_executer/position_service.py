@@ -11,11 +11,13 @@ from math import pi
 
 from crl_executer.transformations import euler_from_quaternion, yaw_from_coordinates
 
-LINEAR_VELOCITY = 0.25  # originally 0.1  # m/s
+LINEAR_VELOCITY = 0.33  # originally 0.1  # m/s
 ANGULAR_VELOCITY = pi / 10  # originally was pi / 10  # rad/s
-EPSILON = 2e-3  # originally 1e-3
+EPSILON = 1e-3  # originally 1e-3
 POLL_RATE = (1e-4)/2  # originally 1e-4# sec
-
+POLL_RATE_FORWARD = 0.002  # ours. still in test
+# DIST_EPSILON = 1e-3
+# STACK_EPSILON = 1e-30
 
 class PositionTracker(Node):
     def __init__(self, node_name: str):
@@ -61,9 +63,11 @@ class PositionService(Node):
 
     def service_callback(self, request, response):
         self.times_called += 1
-        self.get_logger().info(f'Service got {request}.')
-        self.get_logger().info(f'Position service for {self.name} called {self.times_called} times.')
+        self.get_logger().info(f'.')
+        self.get_logger().info(f'Position service for {self.name} called {self.times_called} times. '
+                               f'Service got {request}')
 
+        print("")
         if request.action == 0:
             x, y, yaw = self.to_yaw(request.x, request.y)
         elif request.action == 1:
@@ -101,11 +105,14 @@ class PositionService(Node):
     def drive_closest_to_point(self, x_target, y_target):
 
         x, y, yaw = self.get_position(self.name)
-        yaw_target = yaw_from_coordinates(x_target - x, y_target - y)
-        delta = abs(yaw - yaw_target)
+        print(f'{self.name}:)c) i think i am at x,y={x},{y}')
         drive = self.drive_forward
-        if delta > abs(delta - np.pi):
-            drive = self.drive_backward
+
+        # yaw_target = yaw_from_coordinates(x_target - x, y_target - y)  # TODO walking backward not supported yet
+        # delta = abs(yaw - yaw_target)
+        # if delta > abs(delta - np.pi):
+        #     # print(f'{self.name}:)c) WTF')
+        #     drive = self.drive_backward
 
         def l2(x_target, y_target, x_curr, y_curr):
             return np.linalg.norm([x_target - x_curr, y_target - y_curr], 2)
@@ -117,12 +124,21 @@ class PositionService(Node):
         r_curr = find_range(x_target, y_target)
         drive()
 
-        r = r_curr
-        while r <= r_curr + EPSILON ** 2:
-            sleep(5 * POLL_RATE)
-            r_curr, r = r, find_range(x_target, y_target)
+        r_prev = float('inf')
+        counter = 0
+        # while r <= r_curr + EPSILON ** 2:  # original role
+        while r_curr > EPSILON:
+            sleep(5 * POLL_RATE_FORWARD)
+            r_prev = r_curr
+            r_curr = find_range(x_target, y_target)
+            if counter < 50:
+                counter += 1
+            elif r_prev < r_curr - (EPSILON ** 2):
+                print(f'{self.name}> stop walking according to \"STACK\" role!')
+                break
 
         self.stop()
+        # print(f'{self.name}:)f): just after stop to drive. counter was {counter}.  r_curr={r_curr}, r_prev={r_prev} ')
 
         return self.get_position(self.name)
 
