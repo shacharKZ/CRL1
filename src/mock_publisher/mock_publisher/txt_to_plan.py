@@ -30,6 +30,8 @@ def parse_txt_to_plan(plan_path):
 
 
 def dict_plan_to_txt(entities_map, path_out):
+    if path_out is None or path_out == '':
+        return
     with open(path_out, 'w') as f:
         for robot_name in entities_map:
             robot_plan = entities_map[robot_name]
@@ -41,12 +43,15 @@ def move_square(x, y, leg_len, clockwise=True, delta=0.0):
     plan = [[x+delta, y, '']]
     if delta != 0:
         plan.append([x+delta, y, ''])
+    plan.append([x+leg_len, y+delta, ''])
+    plan.append([x+leg_len-delta, y+leg_len, ''])
+    plan.append([x, y+leg_len-delta, ''])
+    if delta != 0:
+        plan.append([x, y-delta, ''])
+    plan.append([x, y, ''])
+
     if clockwise:
-        plan.append([x+leg_len, y+delta, ''])
-        plan.append([x+leg_len-delta, y+leg_len, ''])
-        plan.append([x, y+leg_len-delta, ''])
-        plan.append([x, y, ''])
-    plan.reverse()
+        plan.reverse()
 
     return plan
 
@@ -68,54 +73,66 @@ def generate_dance0(path_out=None):
     return entities_map
 
 
-def generate_race_condition_test(n=3, out_path=None):
+def generate_race_condition_test(n=3, path_out=None):
     entities_map = {}
     for i in range(n):
         plan = [[i, 0, ''], [i+1, 0, ''], [i-1, 0, '']]
         entities_map[i] = plan
 
-    if out_path is not None:
-        dict_plan_to_txt(entities_map, out_path)
+    if path_out is not None:
+        dict_plan_to_txt(entities_map, path_out)
 
 
-def generate_dance2(n=2, out_path=None):
+def generate_dance2(n=2, path_out=None):
     entities_map = {}
     for i in range(n):
         for j in range(n):
             x = i
             y = j
-            plan = move_square(x, y, 1, delta=0.5) + move_square(x, y, -1)
-            entities_map[i*10+j] = plan
+            plan = move_square(x, y, 1, delta=0.5)
+            # plan = move_square(x, y, 1, delta=0.5) + move_square(x, y, -1)
+            entities_map[i * 10 + j] = plan
+    entities_map[1000] = [[0.5, 0.5, '']]
+    # for i in range(n):
+    #     for j in range(n):
+    #         x = i+2
+    #         y = j+2
+    #         plan = move_square(x, y, 1)
+    #         entities_map[i*10+j+100] = plan
 
-    for i in range(n):
-        for j in range(n):
-            x = i+0.5
-            y = j+0.5
-            plan = move_square(x, y, -1)
-            entities_map[i*10+j+100] = plan
-
-    if out_path is not None:
-        dict_plan_to_txt(entities_map, out_path)
-
-
-def generate_dance1(path_out=None):
-    entities_map = {}
-    for i in range(20):
-        x = -10 + i
-        y = 0
-        plan = [[x, y, '']]
-        even_flag = i % 2 == 0
-        tmp = 1 if even_flag else -1
-        y += tmp
-        plan.append([x, y, ''])
-    if path_out is not None and path_out != "":
+    if path_out is not None:
         dict_plan_to_txt(entities_map, path_out)
 
+
+def generate_plan1(path_out=None):
+    entities_map = {}
+    entities_map[0] = move_square(-0.5, -0.5, 1) + \
+                      move_square(-0.5, -1.5, 2, clockwise=False) + \
+                      move_square(-0.5, -0.5, -1)
+    entities_map[1] = move_square(0.5, 0.5, -1) + \
+                      move_square(0.5, 1.5, -2, clockwise=False) + \
+                      move_square(0.5, 0.5, 1)
+
+    dict_plan_to_txt(entities_map, path_out)
     return entities_map
 
 
+def generate_plan2(n_2=2, path_out=None):
+    entities_map = {}
+    for i in range(n_2):
+        for j in range(n_2):
+            x = i
+            y = j
+            if j % 2 == 0:
+                entities_map[i*10 + j] = [[x, y, '']] + move_square(x+1, y+0.5, 1)
+            else:
+                entities_map[i * 10 + j] = [[x, y, '']] + move_square(x+1, y + 0.5, 1)
 
-def generate_plan(n_entities, path_out=None):
+    dict_plan_to_txt(entities_map, path_out)
+    return entities_map
+
+
+def generate_random_plan(n_entities, path_out=None):
     entities_map = {}
     for i in range(n_entities):
         x = float(random.randint(-3, 3))
@@ -133,8 +150,10 @@ def generate_plan(n_entities, path_out=None):
 
 
 def main():
-    # generate_race_condition_test(n=5, out_path='../../../plans_to_run/test2.txt')
-    generate_dance2(out_path='../../../plans_to_run/dance4.txt')
+    # generate_race_condition_test(n=5, path_out='../../../plans_to_run/test2.txt')
+    # generate_dance2(path_out='../../../plans_to_run/plan4.txt')
+    # generate_plan1(path_out='../../../plans_to_run/turtlebot3_world_s1.txt')
+    generate_plan2(path_out='../../../plans_to_run/plan6.txt')
     # generate_dance(path_out='../../../plans_to_run/dance1.txt')
     # print(generate_plan(n_entities=10, path_out='../../../plans_to_run/plan2.txt'))
     # print('plan0 is:')

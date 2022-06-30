@@ -22,7 +22,7 @@ BASE_ROBOT_TOPIC = '/robot/'
 
 ROBOT_CACHE = {}
 TIMER_PERIOD = 5
-QUEUE_SIZE = 20
+QUEUE_SIZE = 30
 
 class Executer(Node):
     def __init__(self):
