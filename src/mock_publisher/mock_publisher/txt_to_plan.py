@@ -117,7 +117,7 @@ def generate_plan1(path_out=None):
     return entities_map
 
 
-def generate_plan2(n_2=2, path_out=None):
+def generate_plan2(n_2=3, path_out=None):
     entities_map = {}
     for i in range(n_2):
         for j in range(n_2):
