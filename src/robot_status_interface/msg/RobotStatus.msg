@@ -1,0 +1,2 @@
+int64 robot_id
+geometry_msgs/PoseStamped current_location

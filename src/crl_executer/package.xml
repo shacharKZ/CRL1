@@ -1,14 +1,19 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>py_action_server</name>
+  <name>crl_executer</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="mor@todo.todo">mor</maintainer>
+  <maintainer email="1912.mor@gmail.com">mor</maintainer>
   <license>TODO: License declaration</license>
 
   <depend>rclpy</depend>
-  <exec_depend>executer_interfaces</exec_depend>
+  <exec_depend>goal_status_interface</exec_depend>
+  <exec_depend>robot_status_interface</exec_depend>
+  <exec_depend>robot_path_assignment_interface</exec_depend>
+  <exec_depend>multi_burger_interfaces</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
