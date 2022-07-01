@@ -9,7 +9,7 @@ from mock_publisher.txt_to_plan import parse_txt_to_plan
 
 PLAN_TOPIC = '/plan'
 # PATH_TO_PLAN = './plans_to_run/test0.txt'
-# DEFAULT_PLAN = './plans_to_run/turtlebot3_dqn_stage2_s2.txt'
+# DEFAULT_PLAN = './plans_to_run/box_demo.txt'
 DEFAULT_PLAN = './plans_to_run/plan6.txt'
 DEFAULT_WORLD = None  # TODO
 QUEUE_SIZE = 30  # uses also as a bottleneck for the number of robots in scene (QUEUE_SIZE-2)

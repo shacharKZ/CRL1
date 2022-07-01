@@ -152,7 +152,7 @@ def generate_random_plan(n_entities, path_out=None):
 def main():
     # generate_race_condition_test(n=5, path_out='../../../plans_to_run/test2.txt')
     # generate_dance2(path_out='../../../plans_to_run/plan4.txt')
-    # generate_plan1(path_out='../../../plans_to_run/turtlebot3_world_s1.txt')
+    # generate_plan1(path_out='../../../plans_to_run/world_demo.txt')
     generate_plan2(path_out='../../../plans_to_run/plan6.txt')
     # generate_dance(path_out='../../../plans_to_run/dance1.txt')
     # print(generate_plan(n_entities=10, path_out='../../../plans_to_run/plan2.txt'))
