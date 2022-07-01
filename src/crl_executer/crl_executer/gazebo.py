@@ -9,7 +9,7 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
-def generate_launch_description(map_name='empty_world.world'):
+def generate_launch_description(map_name='turtlebot3_dqn_stage2.world'):
     if map_name not in ['empty_world.world', 'turtlebot3_world.world', 'turtlebot3_dqn_stage2.world']:
         raise(f"unfamiliar map '{map_name}' was given to gazebo in 'generate_launch_description'")
     # Sync robots and gazebo server time
