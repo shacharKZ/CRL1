@@ -135,8 +135,8 @@ class PositionService(Node):
 
         self.stop()
         return self.get_position(self.name)
-        # TODO optional for future work: return a boolean if the robot final position is indeed the position we asked
-        #  him to go to (with some epsilons) or not - then we can verify it was stacked
+        # TODO optional for future work: return a boolean if the robot's final position is indeed the position we asked
+        #  him to go to (with some epsilons) or not - as a method of verifying if it is stuck or not
 
     def drive_forward(self):
         forward = Twist()

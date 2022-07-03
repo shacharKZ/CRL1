@@ -9,18 +9,14 @@ from mock_publisher.txt_to_plan import parse_txt_to_plan
 
 PLAN_TOPIC = '/plan'
 DEFAULT_PLAN = './plans_to_run/plan6.txt'
-QUEUE_SIZE = 30  # Also uses as a bottleneck for the number of robots in scene (QUEUE_SIZE-1)
-
+QUEUE_SIZE = 30
 
 '''
-a publisher of a plan to the executer
-note: at the moment the planner component is mocked.
-The plan itself can be a file int the is in the format of:
-<robot ID (int)> <x position> <y position> <goal message>
-or a dict where where the entry with x 
-represent the robot with the ID x and its value is a list of 
-position (task) it should move according to
+A ROS2 Node which mocks a publisher of a robot movement plan to a /plan topic
+This is a mock Node which currently parses a txt file into a plan that can be sent to the Executer Node
 '''
+
+
 class MockPublisher(Node):
     msg_publisher = None
 

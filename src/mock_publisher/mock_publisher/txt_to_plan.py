@@ -3,11 +3,11 @@ import random
 
 
 '''
-given a file where each line is in the format of:
+This function receives the path to a plan file, in the file every line is in the following format:
 <robot ID (int)> <x position> <y position> <goal message>
-parse this file into a dict of list, where the entry with x 
-represent the robot with the ID x and its value is a list of 
-position (task) it should move according to
+goal message can either be: finish or goal-<id>, where the id is a number representing the goal, regardless of the id of the robot that is set to handle it
+
+This function outputs a dictionary where every key represents a robot and the value is a list of (x,y,goal_message)
 '''
 def parse_txt_to_plan(plan_path):
     entities_map = {}
@@ -18,7 +18,6 @@ def parse_txt_to_plan(plan_path):
                 continue
             if len(line) < 3:
                 warnings.warn(f'skip un-parseable line: {line}')
-            # print(line)
             try:
                 robot_num = int(line[0])
             except:
@@ -37,8 +36,7 @@ def parse_txt_to_plan(plan_path):
 
 
 '''
-given an dict representing a plan write a txt file
-representing it (the opposite to the function parse_txt_to_plan() )
+Generate a text file from a dictionary of robot plans (performs the opposite of the parse_txt_to_plan function)
 '''
 def dict_plan_to_txt(entities_map, path_out):
     if path_out is None or path_out == '':

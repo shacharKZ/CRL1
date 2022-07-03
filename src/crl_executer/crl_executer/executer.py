@@ -26,8 +26,9 @@ QUEUE_SIZE = 30
 
 
 '''
-A component which subscribe to a publisher planner (mocked at the moment by "publisher.py")
-given a message (publish) of a plan it spawn and execute the task of each robot
+A ROS2 Node which subscribes to a /plan topic, receives a plan and then sends instructions to designated robots
+The Node also publishes a /robotStatus topic which continuously publishes the location of each robot
+The Node also publishes a /goalStatus topic which publishes updates about the status of different goals
 '''
 class Executer(Node):
     def __init__(self):
@@ -61,11 +62,11 @@ class Executer(Node):
             message = RobotStatus()
             message.robot_id = robot_id
             message.current_location = self._construct_pose_stamped(position)
-            # self.get_logger().info(f'Publishing status of robot {robot_id}')  # TODO
+            self.get_logger().info(f'Publishing status of robot {robot_id}')
             self.robot_status_topic.publish(message)
 
     def publish_goal_status(self, goal_id, status):
-        # self.get_logger().info(f'Publishing status: {status} of goal {goal_id}')  # TODO
+        self.get_logger().info(f'Publishing status: {status} of goal {goal_id}')
         message = GoalStatus()
         message.goal_id = int(goal_id)
         message.status = status
