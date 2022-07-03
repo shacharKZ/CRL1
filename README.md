@@ -20,7 +20,7 @@ Gazebo and Turtlebot3 installation should be performed as shown in the [Robotis 
 
 Turtlebot3 simulations should be installed as shown in the [Robotis Turtlebot3 Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/) tutorial (be sure to switch to Foxy at the top of the page)
 
-**Important!** - Always remember to source the ROS2 packages you are going to use and to export the correct shell variables, at the very minimum you need the following in your `.bashrc` file:
+**Important!** - Always remember to source the ROS2 packages you are going to use and to export the correct shell variables, at the very minimum you need the following in your `.bashrc` file (assuming you cloned the Turtlebot3 Simulations repository to your users homedir `~/`):
 
 ```shell
 source /opt/ros/<galactic/foxy>/setup.bash
