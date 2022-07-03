@@ -2,6 +2,13 @@ import warnings
 import random
 
 
+'''
+given a file where each line is in the format of:
+<robot ID (int)> <x position> <y position> <goal message>
+parse this file into a dict of list, where the entry with x 
+represent the robot with the ID x and its value is a list of 
+position (task) it should move according to
+'''
 def parse_txt_to_plan(plan_path):
     entities_map = {}
     with open(plan_path) as f:
@@ -29,6 +36,10 @@ def parse_txt_to_plan(plan_path):
     return entities_map
 
 
+'''
+given an dict representing a plan write a txt file
+representing it (the opposite to the function parse_txt_to_plan() )
+'''
 def dict_plan_to_txt(entities_map, path_out):
     if path_out is None or path_out == '':
         return
@@ -39,6 +50,9 @@ def dict_plan_to_txt(entities_map, path_out):
                 f.write(f'{robot_name} {task[0]} {task[1]}\n')
 
 
+'''
+return a list for commanding a robot to move in a square
+'''
 def move_square(x, y, leg_len, clockwise=True, delta=0.0):
     plan = [[x+delta, y, '']]
     if delta != 0:
@@ -55,55 +69,9 @@ def move_square(x, y, leg_len, clockwise=True, delta=0.0):
 
     return plan
 
-
-def generate_dance0(path_out=None):
-    entities_map = {}
-    for i in range(10):
-        x = 0
-        y = i/2.0 - 7.0
-        flag_clockwise = i % 2 == 0
-        plan = move_square(x, y, i+0.5, flag_clockwise)
-        entities_map[i] = plan
-    if path_out is not None and path_out != "":
-        with open(path_out, 'w') as f:
-            for robot_name in entities_map:
-                robot_plan = entities_map[robot_name]
-                for task in robot_plan:
-                    f.write(f'{robot_name} {task[0]} {task[1]}\n')
-    return entities_map
-
-
-def generate_race_condition_test(n=3, path_out=None):
-    entities_map = {}
-    for i in range(n):
-        plan = [[i, 0, ''], [i+1, 0, ''], [i-1, 0, '']]
-        entities_map[i] = plan
-
-    if path_out is not None:
-        dict_plan_to_txt(entities_map, path_out)
-
-
-def generate_dance2(n=2, path_out=None):
-    entities_map = {}
-    for i in range(n):
-        for j in range(n):
-            x = i
-            y = j
-            plan = move_square(x, y, 1, delta=0.5)
-            # plan = move_square(x, y, 1, delta=0.5) + move_square(x, y, -1)
-            entities_map[i * 10 + j] = plan
-    entities_map[1000] = [[0.5, 0.5, '']]
-    # for i in range(n):
-    #     for j in range(n):
-    #         x = i+2
-    #         y = j+2
-    #         plan = move_square(x, y, 1)
-    #         entities_map[i*10+j+100] = plan
-
-    if path_out is not None:
-        dict_plan_to_txt(entities_map, path_out)
-
-
+'''
+create a mocked plan for the executer
+'''
 def generate_plan1(path_out=None):
     entities_map = {}
     entities_map[0] = move_square(-0.5, -0.5, 1) + \
@@ -117,6 +85,9 @@ def generate_plan1(path_out=None):
     return entities_map
 
 
+'''
+create a mocked plan for the executer
+'''
 def generate_plan2(n_2=3, path_out=None):
     entities_map = {}
     for i in range(n_2):
@@ -132,6 +103,9 @@ def generate_plan2(n_2=3, path_out=None):
     return entities_map
 
 
+'''
+create a mocked (and random) plan for the executer
+'''
 def generate_random_plan(n_entities, path_out=None):
     entities_map = {}
     for i in range(n_entities):
@@ -150,14 +124,7 @@ def generate_random_plan(n_entities, path_out=None):
 
 
 def main():
-    # generate_race_condition_test(n=5, path_out='../../../plans_to_run/test2.txt')
-    # generate_dance2(path_out='../../../plans_to_run/plan4.txt')
-    # generate_plan1(path_out='../../../plans_to_run/world_demo.txt')
-    generate_plan2(path_out='../../../plans_to_run/plan6.txt')
-    # generate_dance(path_out='../../../plans_to_run/dance1.txt')
-    # print(generate_plan(n_entities=10, path_out='../../../plans_to_run/plan2.txt'))
-    # print('plan0 is:')
-    # print(parse_txt_to_plan('../../../plans_to_run/plan0.txt'))
+    generate_plan2(path_out='../../../plans_to_run/plan_example1.txt')
 
 
 if __name__ == '__main__':

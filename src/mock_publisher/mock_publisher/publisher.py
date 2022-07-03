@@ -8,13 +8,19 @@ from robot_path_assignment_interface.msg import RobotPathAssignment, RobotPathAs
 from mock_publisher.txt_to_plan import parse_txt_to_plan
 
 PLAN_TOPIC = '/plan'
-# PATH_TO_PLAN = './plans_to_run/test0.txt'
-# DEFAULT_PLAN = './plans_to_run/box_demo.txt'
 DEFAULT_PLAN = './plans_to_run/plan6.txt'
-DEFAULT_WORLD = None  # TODO
-QUEUE_SIZE = 30  # uses also as a bottleneck for the number of robots in scene (QUEUE_SIZE-2)
+QUEUE_SIZE = 30  # Also uses as a bottleneck for the number of robots in scene (QUEUE_SIZE-1)
 
 
+'''
+a publisher of a plan to the executer
+note: at the moment the planner component is mocked.
+The plan itself can be a file int the is in the format of:
+<robot ID (int)> <x position> <y position> <goal message>
+or a dict where where the entry with x 
+represent the robot with the ID x and its value is a list of 
+position (task) it should move according to
+'''
 class MockPublisher(Node):
     msg_publisher = None
 
@@ -24,13 +30,11 @@ class MockPublisher(Node):
         plan_from_input = self.get_parameter('plan').value
         self.msg_publisher = self.create_publisher(RobotPathAssignmentPlan, PLAN_TOPIC, QUEUE_SIZE)
         self.path_to_plan = plan_from_input
-        # self.map_to_load = map_to_load if map_to_load is not None else DEFAULT_WORLD  # TODO
         self.publish_mock_message_to_topic()
 
     def publish_mock_message_to_topic(self):
         full_message = RobotPathAssignmentPlan()
         full_plan = parse_txt_to_plan(plan_path=self.path_to_plan)
-        # TODO set up map/scene
         for robot_entity in full_plan:
             robot_plan = full_plan[robot_entity]
             self.get_logger().info(f'plan for robot={robot_entity} is {robot_plan}')
@@ -49,7 +53,7 @@ class MockPublisher(Node):
     def construct_pose_stamped(self, px, py, pz):
         pose = PoseStamped()
         pose.header.frame_id = 'map'
-        pose.header.stamp = self.get_clock().now().to_msg()  # TODO try to look into that
+        pose.header.stamp = self.get_clock().now().to_msg()
         pose.pose.position.x = px
         pose.pose.position.y = py
         pose.pose.position.z = pz

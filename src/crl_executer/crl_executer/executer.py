@@ -24,6 +24,11 @@ ROBOT_CACHE = {}
 TIMER_PERIOD = 5
 QUEUE_SIZE = 30
 
+
+'''
+A component which subscribe to a publisher planner (mocked at the moment by "publisher.py")
+given a message (publish) of a plan it spawn and execute the task of each robot
+'''
 class Executer(Node):
     def __init__(self):
         super().__init__('Executer')
@@ -50,7 +55,7 @@ class Executer(Node):
 
     def publish_robot_status(self):
         # Query all robot locations and send them over the topic
-        self.get_logger().info('Publishing all robot status')  # TODO
+        self.get_logger().info('Publishing all robot status')
         for robot_id in ROBOT_CACHE.keys():
             position = self._get_position_by_name(f"robot{robot_id}")
             message = RobotStatus()
@@ -67,7 +72,7 @@ class Executer(Node):
         self.goal_status_topic.publish(message)
 
     def _get_robot_status_from_opti_track(self):
-        # TODO: how?
+        # TODO: currently not supported
         # In here we will subscribe to optiTrack somehow, and upon receiving events, a callback
         # will be issued that will publish the RobotStatus
         pass

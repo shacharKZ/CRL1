@@ -8,7 +8,24 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
+'''
+run this file with "ros2 launch ./src/crl_executer/crl_executer/gazebo.py"
+in theory, you can run any gazebo map (world). just change the name of the 
+default map_name arg.
+note to added the following block of code in the map ".world" 
+file (like "/opt/ros/galactic/share/turtlebot3_gazebo/world/empty_world.world"):
 
+<plugin name="gazebo_ros_state" filename="libgazebo_ros_state.so">
+      <ros>
+        <namespace></namespace>
+        <argument>model_states:=model_states_demo</argument>
+        <argument>link_states:=link_states_demo</argument>
+      </ros>
+
+      <update_rate>1.0</update_rate>
+</plugin>
+    
+'''
 def generate_launch_description(map_name='empty_world.world'):
     # Sync robots and gazebo server time
     use_sim_time = LaunchConfiguration('use_sim_time', default='True')

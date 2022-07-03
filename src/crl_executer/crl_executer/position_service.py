@@ -11,13 +11,12 @@ from math import pi
 
 from crl_executer.transformations import euler_from_quaternion, yaw_from_coordinates
 
-LINEAR_VELOCITY = 0.33  # originally 0.1  # m/s
-ANGULAR_VELOCITY = pi / 10  # originally was pi / 10  # rad/s
-EPSILON = 1e-3  # originally 1e-3
-POLL_RATE = (1e-4)/2  # originally 1e-4# sec
-POLL_RATE_FORWARD = 0.002  # ours. still in test
-# DIST_EPSILON = 1e-3
-# STACK_EPSILON = 1e-30
+LINEAR_VELOCITY = 0.33  # previously 0.1  # m/s
+ANGULAR_VELOCITY = pi / 10  # previously was pi / 10  # rad/s
+EPSILON = 1e-3  # previously 1e-3
+POLL_RATE = (1e-4)/2  # previously 1e-4# sec
+POLL_RATE_FORWARD = 0.002
+
 
 class PositionTracker(Node):
     def __init__(self, node_name: str):
@@ -103,7 +102,6 @@ class PositionService(Node):
         return x, y, yaw
 
     def drive_closest_to_point(self, x_target, y_target):
-
         x, y, yaw = self.get_position(self.name)
         print(f'{self.name}:)c) i think i am at x,y={x},{y}')
         drive = self.drive_forward
@@ -111,7 +109,6 @@ class PositionService(Node):
         # yaw_target = yaw_from_coordinates(x_target - x, y_target - y)  # TODO walking backward not supported yet
         # delta = abs(yaw - yaw_target)
         # if delta > abs(delta - np.pi):
-        #     # print(f'{self.name}:)c) WTF')
         #     drive = self.drive_backward
 
         def l2(x_target, y_target, x_curr, y_curr):
@@ -126,7 +123,6 @@ class PositionService(Node):
 
         r_prev = float('inf')
         counter = 0
-        # while r <= r_curr + EPSILON ** 2:  # original role
         while r_curr > EPSILON:
             sleep(5 * POLL_RATE_FORWARD)
             r_prev = r_curr
@@ -138,9 +134,9 @@ class PositionService(Node):
                 break
 
         self.stop()
-        # print(f'{self.name}:)f): just after stop to drive. counter was {counter}.  r_curr={r_curr}, r_prev={r_prev} ')
-
         return self.get_position(self.name)
+        # TODO optional for future work: return a boolean if the robot final position is indeed the position we asked
+        #  him to go to (with some epsilons) or not - then we can verify it was stacked
 
     def drive_forward(self):
         forward = Twist()
