@@ -167,3 +167,13 @@ If you want to look at the contents of the `/goalStatus` topic:
 3. Look at the message stream from the `/goalStatus` topic by running the command: `ros2 topic echo /goalStatus`
 
 **Note:** The `/goalStatus` topic will only publish messages if the plan text file has goals in it, for an example file with goals speicifed, look at the [plan2.txt](./plans_to_run/plan2.txt) file under the `plans_to_run` directory
+
+### Included Interfaces
+
+The following interfaces are included in this repository:
+
+- GoalStatus - used to report goals to the `/goalStatus` topic
+- RobotStatus - used to report the status of each robot to the `/robotStatus` topic periodically
+- RobotPathAssignment - used to specify a plan for a single robot
+- RobotPathAssignmentPlan - a wrapper interface for an array of `RobotPathAssignment` messages
+- Position - a service interface used by the Position service to report the position of a robot back to the `Executer` 
