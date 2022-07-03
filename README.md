@@ -15,8 +15,8 @@ In order to correctly run the code in this repository and use the Executer packa
 - **Additional packages:** Gazebo, Turtlebot3, Turtlebot3 Simulations
 
 ROS2 installation should be performed using packages as shown in the [ROS2 Tutorial](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html#ubuntu-debian)
-Gazebo and Turtlebot3 installation should be performed as shown in the [Robotis Turtlebot3 PC Setup](https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/#pc-setup) tutorial
-Turtlebot3 simulations should be installed as shown in the [Robotis Turtlebot3 Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/) tutorial
+Gazebo and Turtlebot3 installation should be performed as shown in the [Robotis Turtlebot3 PC Setup](https://emanual.robotis.com/docs/en/platform/turtlebot3/quick-start/#pc-setup) tutorial (be sure to switch to Foxy at the top of the page)
+Turtlebot3 simulations should be installed as shown in the [Robotis Turtlebot3 Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/) tutorial (be sure to switch to Foxy at the top of the page)
 
 **Important!** - Always remember to source the ROS2 packages you are going to use and to export the correct shell variables, at the very minimum you need the following in your `.bashrc` file:
 
